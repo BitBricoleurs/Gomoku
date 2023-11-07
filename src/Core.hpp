@@ -16,6 +16,8 @@ namespace Gomoku {
         BEGIN,
         BOARD,
         END,
+        INFO,
+        ABOUT,
         UNKNOWN
     };
 
@@ -29,9 +31,9 @@ namespace Gomoku {
 
         private:
             GameBot myBot;
-        bool parseCommand(const std::string& command, const std::vector<std::string>& args);
-            std::unordered_map<std::string, CommandType> commandMap;
-            void initializeCommandMap();
+            bool parseCommand(const std::string& command, const std::vector<std::string>& args);
+                std::unordered_map<std::string, CommandType> commandMap;
+                void initializeCommandMap();
     };
 
 }

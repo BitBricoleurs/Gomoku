@@ -16,6 +16,8 @@ namespace Gomoku {
         commandMap["BEGIN"] = CommandType::BEGIN;
         commandMap["BOARD"] = CommandType::BOARD;
         commandMap["END"] = CommandType::END;
+        commandMap["INFO"] = CommandType::INFO;
+        commandMap["ABOUT"] = CommandType::ABOUT;
     }
 
     void Core::run() {
@@ -45,28 +47,35 @@ namespace Gomoku {
 
         switch (cmdType) {
             case CommandType::START:
-                if (args.size() == 1) {
-                    int boardSize = std::stoi(args[0]);
-                    std::cout << "OK" << std::endl;
-                    return true;
-                }
-                break;
+                myBot.handleStart(args);
+                return true;
             case CommandType::TURN:
+                myBot.handleTurn(args);
                 return true;
 
             case CommandType::BEGIN:
+                myBot.handleBegin();
                 return true;
 
             case CommandType::BOARD:
+                myBot.handleBoard(args);
                 return true;
 
             case CommandType::END:
+                myBot.handleEnd();
+                return true;
+
+            case CommandType::INFO:
+                myBot.handleInfo(args);
+                return true;
+
+            case CommandType::ABOUT:
+                myBot.handleAbout();
                 return true;
 
             default:
                 return false;
         }
-        return false;
     }
 
     std::vector<std::string> Gomoku::Core::splitString(const std::string& str, char delimiter) {
