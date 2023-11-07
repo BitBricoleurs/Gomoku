@@ -5,8 +5,6 @@ env:
 
 on:
   push:
-    paths-ignore:
-      - ".github/**" # Exclude the workflows
   delete:
   create:
 
