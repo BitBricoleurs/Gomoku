@@ -129,6 +129,54 @@ pbrain-gomoku-ai/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/build
 .PHONY : pbrain-gomoku-ai/fast
 
+src/Board.o: src/Board.cpp.o
+.PHONY : src/Board.o
+
+# target to build an object file
+src/Board.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o
+.PHONY : src/Board.cpp.o
+
+src/Board.i: src/Board.cpp.i
+.PHONY : src/Board.i
+
+# target to preprocess a source file
+src/Board.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.i
+.PHONY : src/Board.cpp.i
+
+src/Board.s: src/Board.cpp.s
+.PHONY : src/Board.s
+
+# target to generate assembly for a file
+src/Board.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.s
+.PHONY : src/Board.cpp.s
+
+src/Cell.o: src/Cell.cpp.o
+.PHONY : src/Cell.o
+
+# target to build an object file
+src/Cell.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o
+.PHONY : src/Cell.cpp.o
+
+src/Cell.i: src/Cell.cpp.i
+.PHONY : src/Cell.i
+
+# target to preprocess a source file
+src/Cell.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.i
+.PHONY : src/Cell.cpp.i
+
+src/Cell.s: src/Cell.cpp.s
+.PHONY : src/Cell.s
+
+# target to generate assembly for a file
+src/Cell.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.s
+.PHONY : src/Cell.cpp.s
+
 src/Core.o: src/Core.cpp.o
 .PHONY : src/Core.o
 
@@ -201,6 +249,30 @@ src/GameBot.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/GameBot.cpp.s
 .PHONY : src/GameBot.cpp.s
 
+src/Move.o: src/Move.cpp.o
+.PHONY : src/Move.o
+
+# target to build an object file
+src/Move.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o
+.PHONY : src/Move.cpp.o
+
+src/Move.i: src/Move.cpp.i
+.PHONY : src/Move.i
+
+# target to preprocess a source file
+src/Move.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.i
+.PHONY : src/Move.cpp.i
+
+src/Move.s: src/Move.cpp.s
+.PHONY : src/Move.s
+
+# target to generate assembly for a file
+src/Move.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pbrain-gomoku-ai.dir/build.make CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.s
+.PHONY : src/Move.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -234,6 +306,12 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... pbrain-gomoku-ai"
+	@echo "... src/Board.o"
+	@echo "... src/Board.i"
+	@echo "... src/Board.s"
+	@echo "... src/Cell.o"
+	@echo "... src/Cell.i"
+	@echo "... src/Cell.s"
 	@echo "... src/Core.o"
 	@echo "... src/Core.i"
 	@echo "... src/Core.s"
@@ -243,6 +321,9 @@ help:
 	@echo "... src/GameBot.o"
 	@echo "... src/GameBot.i"
 	@echo "... src/GameBot.s"
+	@echo "... src/Move.o"
+	@echo "... src/Move.i"
+	@echo "... src/Move.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -125,12 +125,57 @@ CMakeFiles/pbrain-gomoku-ai.dir/src/Error.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/pbrain-gomoku-ai.dir/src/Error.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alexandre/Delivery/Gomoku/src/Error.cpp -o CMakeFiles/pbrain-gomoku-ai.dir/src/Error.cpp.s
 
+CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o: CMakeFiles/pbrain-gomoku-ai.dir/flags.make
+CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o: /home/alexandre/Delivery/Gomoku/src/Board.cpp
+CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o: CMakeFiles/pbrain-gomoku-ai.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/alexandre/Delivery/Gomoku/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o -MF CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o.d -o CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o -c /home/alexandre/Delivery/Gomoku/src/Board.cpp
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alexandre/Delivery/Gomoku/src/Board.cpp > CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.i
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alexandre/Delivery/Gomoku/src/Board.cpp -o CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.s
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o: CMakeFiles/pbrain-gomoku-ai.dir/flags.make
+CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o: /home/alexandre/Delivery/Gomoku/src/Move.cpp
+CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o: CMakeFiles/pbrain-gomoku-ai.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/alexandre/Delivery/Gomoku/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o -MF CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o.d -o CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o -c /home/alexandre/Delivery/Gomoku/src/Move.cpp
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alexandre/Delivery/Gomoku/src/Move.cpp > CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.i
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alexandre/Delivery/Gomoku/src/Move.cpp -o CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.s
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o: CMakeFiles/pbrain-gomoku-ai.dir/flags.make
+CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o: /home/alexandre/Delivery/Gomoku/src/Cell.cpp
+CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o: CMakeFiles/pbrain-gomoku-ai.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/alexandre/Delivery/Gomoku/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o -MF CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o.d -o CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o -c /home/alexandre/Delivery/Gomoku/src/Cell.cpp
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/alexandre/Delivery/Gomoku/src/Cell.cpp > CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.i
+
+CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/alexandre/Delivery/Gomoku/src/Cell.cpp -o CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.s
+
 # Object files for target pbrain-gomoku-ai
 pbrain__gomoku__ai_OBJECTS = \
 "CMakeFiles/pbrain-gomoku-ai.dir/src/GameBot.cpp.o" \
 "CMakeFiles/pbrain-gomoku-ai.dir/src/Core.cpp.o" \
 "CMakeFiles/pbrain-gomoku-ai.dir/src/main.cpp.o" \
-"CMakeFiles/pbrain-gomoku-ai.dir/src/Error.cpp.o"
+"CMakeFiles/pbrain-gomoku-ai.dir/src/Error.cpp.o" \
+"CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o" \
+"CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o" \
+"CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o"
 
 # External object files for target pbrain-gomoku-ai
 pbrain__gomoku__ai_EXTERNAL_OBJECTS =
@@ -139,9 +184,12 @@ pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/GameBot.cpp.o
 pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/Core.cpp.o
 pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/main.cpp.o
 pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/Error.cpp.o
+pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/Board.cpp.o
+pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/Move.cpp.o
+pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/src/Cell.cpp.o
 pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/build.make
 pbrain-gomoku-ai: CMakeFiles/pbrain-gomoku-ai.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/alexandre/Delivery/Gomoku/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable pbrain-gomoku-ai"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/alexandre/Delivery/Gomoku/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable pbrain-gomoku-ai"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/pbrain-gomoku-ai.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
