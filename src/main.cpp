@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Core.hpp"
-#include "GameBot.hpp"
 #include "Error.hpp"
 
 int main() {

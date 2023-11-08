@@ -9,5 +9,8 @@ target_sources(${PROJECT_NAME_GOMOKU}
         ${CMAKE_CURRENT_SOURCE_DIR}/Core.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Error.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Board.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Move.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Cell.cpp
 )
 

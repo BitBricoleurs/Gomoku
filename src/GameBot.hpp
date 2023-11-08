@@ -20,7 +20,6 @@
 #endif
 
 #include "Board.hpp"
-#include "Move.hpp"
 
     constexpr int MAX_MEMORY_MB = 70;
     constexpr std::chrono::seconds MAX_TIME_PER_MOVE(5);
@@ -49,11 +48,13 @@ namespace Gomoku {
 
         static void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
                                      const std::chrono::time_point<std::chrono::steady_clock> &endTime);
+        Move calculateBestMove();
 
         static void enforceMemoryLimit();
 
         std::map<std::string, std::string> infoMap;
         std::unique_ptr<Board> board;
         bool endBot = false;
+        int DEPTH = 5;
     };
 }

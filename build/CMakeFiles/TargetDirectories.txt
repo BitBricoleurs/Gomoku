@@ -1,5 +1,0 @@
-/home/alexandre/Delivery/Gomoku/build/CMakeFiles/pbrain-gomoku-ai.dir
-/home/alexandre/Delivery/Gomoku/build/CMakeFiles/edit_cache.dir
-/home/alexandre/Delivery/Gomoku/build/CMakeFiles/rebuild_cache.dir
-/home/alexandre/Delivery/Gomoku/build/src/CMakeFiles/edit_cache.dir
-/home/alexandre/Delivery/Gomoku/build/src/CMakeFiles/rebuild_cache.dir

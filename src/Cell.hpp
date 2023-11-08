@@ -18,7 +18,7 @@ namespace Gomoku {
 
         void set_state(CellState new_state);
 
-        CellState get_state() const;
+        [[nodiscard]] CellState get_state() const;
 
     private:
         CellState state;

@@ -7,7 +7,9 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <numeric>
 #include "Cell.hpp"
+#include "Move.hpp"
 
 namespace Gomoku {
 
@@ -17,14 +19,32 @@ namespace Gomoku {
 
         [[nodiscard]] bool isValidMove(int x, int y) const;
 
-        void makeMove(int x, int y, CellState player);
+        void makeMove(int x, int y, CellState type);
 
         void undoMove(int x, int y);
 
         [[nodiscard]] int evaluate() const;
 
+        void clear();
+
+        [[nodiscard]] std::vector<Move> getLegalMoves() const;
+
+        [[nodiscard]] bool isGameOver() const;
+
+        [[nodiscard]] bool isGameOverFor(CellState type) const;
+
+        [[nodiscard]] bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
+
+        int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
+
+        [[nodiscard]] int evaluateDirection(int x, int y, int dx, int dy, CellState type) const;
+
+        [[nodiscard]] int evaluateCell(int x, int y, CellState player) const;
+
+
     private:
         int size;
         std::vector<std::vector<Cell>> cells;
+        [[nodiscard]] bool isValidCoordinate(int x, int y) const;
     };
 }

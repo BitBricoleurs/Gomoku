@@ -3,6 +3,7 @@
 //
 
 #include "GameBot.hpp"
+#include "Core.hpp"
 
 void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock>& startTime,
                                const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
@@ -59,6 +60,7 @@ bool Gomoku::GameBot::areValidCoordinates(const std::string& xStr, const std::st
 
 void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
     if (args.size() == 1) {
+        std::cout << "yes" << std::endl;
         int size = std::stoi(args[0]);
         if (isValidBoardSize(size)) {
             board = std::make_unique<Board>(size);
@@ -74,12 +76,13 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
 void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 {
     auto startTime = std::chrono::steady_clock::now();
-    Move opponentMove(args[0], args[1]);
-    if (args.size() == 2 && areValidCoordinates(args[0], args[1])) {
+
+    std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
+    Move opponentMove(tokens[0], tokens[1]);
+    if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1])) {
         board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
 
-        //Move bestMove = calculateBestMove();
-        Move bestMove(0, 0);
+        Move bestMove = calculateBestMove();
         respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
         auto endTime = std::chrono::steady_clock::now();
@@ -92,22 +95,47 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 
 void Gomoku::GameBot::handleBegin()
 {
-    auto startTime = std::chrono::steady_clock::now();
+    //auto startTime = std::chrono::steady_clock::now();
 
-    //Move bestMove = calculateBestMove();
-    Move bestMove(0, 0);
+    Move bestMove = calculateBestMove();
     respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
     auto endTime = std::chrono::steady_clock::now();
-    enforceTimeLimit(startTime, endTime);
+    //enforceTimeLimit(startTime, endTime);
     enforceMemoryLimit();
 }
 
-void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
-{
-    // Votre logique pour gérer l'état du plateau de jeu.
-    respond("BOARD message - board state processed");
+void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
+    board->clear();
+
+    for (const auto &line : args) {
+        if (line == "DONE") {
+            Move nextMove = calculateBestMove();
+            respond(std::to_string(nextMove.x) + "," + std::to_string(nextMove.y));
+            return;
+        }
+
+        std::istringstream iss(line);
+        std::string part;
+        std::vector<int> moveDetails;
+
+        while (std::getline(iss, part, ',')) {
+            moveDetails.push_back(std::stoi(part));
+        }
+
+        if (moveDetails.size() == 3) {
+            int x = moveDetails[0];
+            int y = moveDetails[1];
+            auto state = static_cast<CellState>(moveDetails[2]);
+            board->makeMove(x, y, state);
+        } else {
+            respond("ERROR invalid board input");
+            return;
+        }
+    }
+    respond("ERROR board data incomplete");
 }
+
 
 void Gomoku::GameBot::handleEnd()
 {
@@ -137,4 +165,22 @@ void Gomoku::GameBot::handleAbout()
 bool Gomoku::GameBot::isEndBot() const
 {
     return endBot;
+}
+
+Gomoku::Move Gomoku::GameBot::calculateBestMove()
+{
+    int bestScore = std::numeric_limits<int>::min();
+    Move bestMove{-1, -1};
+    for (const auto& move : board->getLegalMoves()) {
+        board->makeMove(move.x, move.y, CellState::Me);
+        int score = board->minimax(DEPTH, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        std::cout << "Score for move " << move.x << "," << move.y << " is " << score << std::endl;
+        board->undoMove(move.x, move.y);
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = move;
+        }
+    }
+    return bestMove;
 }
