@@ -4,17 +4,15 @@
 
 #include "GameBot.hpp"
 
-void Gomoku::GameBot::calculateNextMove()
-{
-    auto startTime = std::chrono::steady_clock::now();
-
-    std::cout << "PLACE_MOVE 1 1" << std::endl;
-    auto endTime = std::chrono::steady_clock::now();
+void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock>& startTime,
+                               const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
     if (std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime) > MAX_TIME_PER_MOVE) {
         std::cerr << "Time limit exceeded" << std::endl;
         std::exit(EXIT_FAILURE);
     }
+}
 
+void Gomoku::GameBot::enforceMemoryLimit() {
     if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
         std::cerr << "Memory limit exceeded" << std::endl;
         std::exit(EXIT_FAILURE);
@@ -34,7 +32,7 @@ size_t Gomoku::GameBot::getMemoryUsage()
                 return 0;
             return info.resident_size;
     #elif __linux__
-            struct rusage usage;
+            struct rusage usage{};
             if (getrusage(RUSAGE_SELF, &usage) == -1)
                 return 0;
             return usage.ru_maxrss * 1024;
@@ -73,19 +71,36 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
     }
 }
 
-void Gomoku::GameBot::handleTurn(const std::vector<std::string> &args) {
-    if (args.size() == 2) {
-        if (areValidCoordinates(args[0], args[1])) {
-        } else {
-            respond("ERROR message - unsupported coordinates or other error");
-        }
+void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
+{
+    auto startTime = std::chrono::steady_clock::now();
+    Move opponentMove(args[0], args[1]);
+    if (args.size() == 2 && areValidCoordinates(args[0], args[1])) {
+        board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
+
+        //Move bestMove = calculateBestMove();
+        Move bestMove(0, 0);
+        respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
+
+        auto endTime = std::chrono::steady_clock::now();
+        enforceTimeLimit(startTime, endTime);
+        enforceMemoryLimit();
     } else {
-        respond("ERROR message - not enough arguments");
+        respond("ERROR invalid coordinates");
     }
 }
 
 void Gomoku::GameBot::handleBegin()
 {
+    auto startTime = std::chrono::steady_clock::now();
+
+    //Move bestMove = calculateBestMove();
+    Move bestMove(0, 0);
+    respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
+
+    auto endTime = std::chrono::steady_clock::now();
+    enforceTimeLimit(startTime, endTime);
+    enforceMemoryLimit();
 }
 
 void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
@@ -96,7 +111,7 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
 
 void Gomoku::GameBot::handleEnd()
 {
-
+    endBot = true;
 }
 
 void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
@@ -117,4 +132,9 @@ void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
 void Gomoku::GameBot::handleAbout()
 {
     respond(R"(name="GameBot", author="Alexandre", version="1.0", country="France")");
+}
+
+bool Gomoku::GameBot::isEndBot() const
+{
+    return endBot;
 }

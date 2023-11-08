@@ -9,6 +9,7 @@ namespace Gomoku {
         int y;
 
         Move(int x, int y);
+        Move(const std::string& x, const std::string& y);
 
     };
 

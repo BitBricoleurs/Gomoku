@@ -8,8 +8,8 @@ namespace Gomoku {
 
     enum class CellState {
         Empty,
-        Player1,
-        Player2
+        Me,
+        Opponent
     };
 
     class Cell {

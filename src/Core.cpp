@@ -23,14 +23,14 @@ namespace Gomoku {
     void Core::run() {
         std::string line = std::string();
 
-        while (std::getline(std::cin, line)) {
+        while (!myBot.isEndBot() && std::getline(std::cin, line)) {
             if (!line.empty()) {
                 auto tokens = splitString(line, ' ');
                 if (!tokens.empty()) {
                     std::string command = tokens.front();
                     tokens.erase(tokens.begin());
                     if (!parseCommand(command, tokens)) {
-                        myBot.respond("UNKNOWN");
+                        Gomoku::GameBot::respond("UNKNOWN");
                     }
                 }
             }

@@ -13,15 +13,15 @@ namespace Gomoku {
 
     class Board {
     public:
-        Board(int size) : size(size), cells(size, std::vector<Cell>(size)) {}
+        explicit Board(int size);
 
-        bool isValidMove(int x, int y) const;
+        [[nodiscard]] bool isValidMove(int x, int y) const;
 
         void makeMove(int x, int y, CellState player);
 
         void undoMove(int x, int y);
 
-        int evaluate() const;
+        [[nodiscard]] int evaluate() const;
 
     private:
         int size;
