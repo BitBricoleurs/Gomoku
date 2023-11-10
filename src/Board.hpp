@@ -23,28 +23,34 @@ namespace Gomoku {
 
         void undoMove(int x, int y);
 
-        [[nodiscard]] int evaluate() const;
-
         void clear();
 
         [[nodiscard]] std::vector<Move> getLegalMoves() const;
 
-        [[nodiscard]] bool isGameOver() const;
-
-        [[nodiscard]] bool isGameOverFor(CellState type) const;
-
-        [[nodiscard]] bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
-
         int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
 
-        [[nodiscard]] int evaluateDirection(int x, int y, int dx, int dy, CellState type) const;
-
-        [[nodiscard]] int evaluateCell(int x, int y, CellState player) const;
+        void printBoard() const;
 
 
     private:
         int size;
         std::vector<std::vector<Cell>> cells;
         [[nodiscard]] bool isValidCoordinate(int x, int y) const;
+
+        [[nodiscard]] int evaluate() const;
+
+        [[nodiscard]] int evaluateLine(int x, int y, int dx, int dy, CellState type) const;
+
+        [[nodiscard]] bool isGameOver() const;
+
+        [[nodiscard]] bool isNearbyOccupied(int x, int y) const;
+
+        [[nodiscard]] bool isGameOverFor(CellState type) const;
+
+        [[nodiscard]] bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
+
+        [[nodiscard]] int evaluateCell(int x, int y, CellState player) const;
+
+        [[nodiscard]] std::vector<Move> getStrategicLegalMoves() const;
     };
 }

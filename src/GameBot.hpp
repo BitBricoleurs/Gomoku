@@ -9,6 +9,8 @@
 #include <chrono>
 #include <thread>
 #include <map>
+#include <mutex>
+#include <cmath>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -28,6 +30,7 @@ namespace Gomoku {
 
     class GameBot {
     public:
+        explicit GameBot(bool isPrintGame);
         GameBot() = default;
 
         void handleStart(const std::vector<std::string>& args);
@@ -40,21 +43,26 @@ namespace Gomoku {
 
         [[nodiscard]] bool isEndBot() const;
         static void respond(const std::string& response);
+        std::map<std::string, std::string> infoMap;
 
     private:
         static size_t getMemoryUsage();
         static bool isValidBoardSize(int size);
         static bool areValidCoordinates(const std::string &xStr, const std::string &yStr);
 
-        static void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
+        void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
                                      const std::chrono::time_point<std::chrono::steady_clock> &endTime);
         Move calculateBestMove();
-
         static void enforceMemoryLimit();
+        void enforceMatchTimeLimit();
 
-        std::map<std::string, std::string> infoMap;
         std::unique_ptr<Board> board;
         bool endBot = false;
-        int DEPTH = 5;
+        int DEPTH = 1;
+
+        std::chrono::steady_clock::time_point matchStartTime;
+        int timeoutMatch = 0;
+        int maxMemoryMB = MAX_MEMORY_MB;
+        bool isPrintGame = false;
     };
 }

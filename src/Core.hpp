@@ -23,7 +23,7 @@ namespace Gomoku {
 
     class Core {
         public :
-            Core();
+            explicit Core(bool isPrintGame);
             ~Core() = default;
 
             void run();
@@ -34,6 +34,7 @@ namespace Gomoku {
             bool parseCommand(const std::string& command, const std::vector<std::string>& args);
                 std::unordered_map<std::string, CommandType> commandMap;
                 void initializeCommandMap();
+        bool isPrintGame;
     };
 
 }

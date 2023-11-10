@@ -6,8 +6,9 @@
 
 namespace Gomoku {
 
-    Core::Core() {
+    Core::Core(bool isPrintGame) : isPrintGame(isPrintGame) {
         initializeCommandMap();
+        myBot = GameBot(isPrintGame);
     }
 
     void Core::initializeCommandMap() {

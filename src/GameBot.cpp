@@ -5,19 +5,27 @@
 #include "GameBot.hpp"
 #include "Core.hpp"
 
+Gomoku::GameBot::GameBot(bool isPrintGame) : isPrintGame(isPrintGame)
+{
+}
+
 void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock>& startTime,
-                               const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
-    if (std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime) > MAX_TIME_PER_MOVE) {
-        std::cerr << "Time limit exceeded" << std::endl;
-        std::exit(EXIT_FAILURE);
+                                       const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
+    auto it = infoMap.find("timeout_turn");
+    if (it != infoMap.end()) {
+        int timeout_turn = std::stoi(it->second);
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() > timeout_turn) {
+            std::cerr << "Time limit for move exceeded" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
     }
 }
 
 void Gomoku::GameBot::enforceMemoryLimit() {
-    if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
+    /*if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
         std::cerr << "Memory limit exceeded" << std::endl;
         std::exit(EXIT_FAILURE);
-    }
+    }*/
 }
 
 size_t Gomoku::GameBot::getMemoryUsage()
@@ -60,11 +68,18 @@ bool Gomoku::GameBot::areValidCoordinates(const std::string& xStr, const std::st
 
 void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
     if (args.size() == 1) {
-        std::cout << "yes" << std::endl;
+        matchStartTime = std::chrono::steady_clock::now();
+
+        auto it = infoMap.find("timeout_match");
+        if (it != infoMap.end()) {
+            timeoutMatch = std::stoi(it->second);
+        }
         int size = std::stoi(args[0]);
         if (isValidBoardSize(size)) {
             board = std::make_unique<Board>(size);
-            respond("OK");
+            respond("OK - everything is good");
+            if (isPrintGame)
+                board->printBoard();
         } else {
             respond("ERROR unsupported size");
         }
@@ -75,6 +90,7 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
 
 void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 {
+    enforceMatchTimeLimit();
     auto startTime = std::chrono::steady_clock::now();
 
     std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
@@ -83,11 +99,14 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
         board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
 
         Move bestMove = calculateBestMove();
+        board->makeMove(bestMove.x, bestMove.y, CellState::Me);
         respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
         auto endTime = std::chrono::steady_clock::now();
         enforceTimeLimit(startTime, endTime);
         enforceMemoryLimit();
+        if (isPrintGame)
+            board->printBoard();
     } else {
         respond("ERROR invalid coordinates");
     }
@@ -95,17 +114,22 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 
 void Gomoku::GameBot::handleBegin()
 {
-    //auto startTime = std::chrono::steady_clock::now();
+    enforceMatchTimeLimit();
+    auto startTime = std::chrono::steady_clock::now();
 
     Move bestMove = calculateBestMove();
+    board->makeMove(bestMove.x, bestMove.y, CellState::Me);
     respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
     auto endTime = std::chrono::steady_clock::now();
-    //enforceTimeLimit(startTime, endTime);
+    enforceTimeLimit(startTime, endTime);
     enforceMemoryLimit();
+    if (isPrintGame)
+        board->printBoard();
 }
 
-void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
+void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
+{
     board->clear();
 
     for (const auto &line : args) {
@@ -142,13 +166,17 @@ void Gomoku::GameBot::handleEnd()
     endBot = true;
 }
 
-void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
+void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args)
+{
     for (const auto& arg : args) {
         std::istringstream iss(arg);
         std::string key;
         std::string value;
         if (std::getline(iss, key, ' ') && std::getline(iss, value)) {
             infoMap[key] = value;
+            if (key == "max_memory") {
+                maxMemoryMB = std::stoi(value) / (1024 * 1024);
+            }
         } else {
             return;
         }
@@ -169,18 +197,54 @@ bool Gomoku::GameBot::isEndBot() const
 
 Gomoku::Move Gomoku::GameBot::calculateBestMove()
 {
+    std::vector<Move> legalMoves = board->getLegalMoves();
     int bestScore = std::numeric_limits<int>::min();
     Move bestMove{-1, -1};
-    for (const auto& move : board->getLegalMoves()) {
-        board->makeMove(move.x, move.y, CellState::Me);
-        int score = board->minimax(DEPTH, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-        std::cout << "Score for move " << move.x << "," << move.y << " is " << score << std::endl;
-        board->undoMove(move.x, move.y);
 
-        if (score > bestScore) {
-            bestScore = score;
-            bestMove = move;
+    unsigned int numThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads(numThreads);
+
+    std::mutex mutex;
+
+    int movesPerThread = std::ceil(legalMoves.size() / static_cast<double>(numThreads));
+    std::cout << "Moves per thread: " << movesPerThread << std::endl;
+    for (unsigned int i = 0; i < numThreads; ++i) {
+        threads[i] = std::thread([&, i]() {
+            int start = i * movesPerThread;
+            int end = std::min(start + movesPerThread, static_cast<int>(legalMoves.size()));
+
+            for (int j = start; j < end; ++j) {
+                Move move = legalMoves[j];
+                board->makeMove(move.x, move.y, CellState::Me);
+                int score = board->minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+                board->undoMove(move.x, move.y);
+
+                std::lock_guard<std::mutex> lock(mutex);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = move;
+                }
+            }
+        });
+    }
+
+    for (auto& t : threads) {
+        if (t.joinable()) {
+            t.join();
         }
     }
     return bestMove;
+}
+
+
+void Gomoku::GameBot::enforceMatchTimeLimit()
+{
+    if (timeoutMatch > 0) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - matchStartTime).count();
+        if (elapsedTime > timeoutMatch) {
+            std::cerr << "Match time limit exceeded" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+    }
 }
