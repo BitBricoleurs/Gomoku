@@ -58,7 +58,7 @@ namespace Gomoku {
 
         std::unique_ptr<Board> board;
         bool endBot = false;
-        int DEPTH = 1;
+        int DEPTH = 3;
 
         std::chrono::steady_clock::time_point matchStartTime;
         int timeoutMatch = 0;

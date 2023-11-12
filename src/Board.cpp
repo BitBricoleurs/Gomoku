@@ -46,12 +46,13 @@ namespace Gomoku {
         return legalMoves;
     }
 
-    std::vector<Move> Board::getStrategicLegalMoves() const {
+    std::vector<Move> Board::getStrategicLegalMoves() const
+    {
         std::vector<Move> legalMoves;
         for (int x = 0; x < size; ++x) {
             for (int y = 0; y < size; ++y) {
                 if (cells[x][y].get_state() == CellState::Empty && isNearbyOccupied(x, y)) {
-                    legalMoves.emplace_back(Move{x, y});
+                    legalMoves.emplace_back(x, y);
                 }
             }
         }
@@ -59,18 +60,17 @@ namespace Gomoku {
     }
 
     bool Board::isNearbyOccupied(int x, int y) const {
-        for (int dx = -2; dx <= 2; ++dx) {
-            for (int dy = -2; dy <= 2; ++dy) {
-                if (dx == 0 && dy == 0) continue;
-                int nx = x + dx, ny = y + dy;
-                if (isValidCoordinate(nx, ny) && cells[nx][ny].get_state() != CellState::Empty) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            for (int dy = -1; dy <= 1; ++dy) {
+                if (dx == 0 && dy == 0) continue; // Skip the current cell
+                int newX = x + dx, newY = y + dy;
+                if (isValidCoordinate(newX, newY) && cells[newX][newY].get_state() != CellState::Empty) {
                     return true;
                 }
             }
         }
         return false;
     }
-
 
     bool Board::isGameOver() const
     {
@@ -127,7 +127,7 @@ namespace Gomoku {
 
         if (isMaximizingPlayer) {
             int maxEval = std::numeric_limits<int>::min();
-            for (const auto& move : getLegalMoves()) {
+            for (const auto& move : getStrategicLegalMoves()) {
                 makeMove(move.x, move.y, CellState::Me);
                 int eval = minimax(depth - 1, false, alpha, beta);
                 undoMove(move.x, move.y);
@@ -140,7 +140,7 @@ namespace Gomoku {
             return maxEval;
         } else {
             int minEval = std::numeric_limits<int>::max();
-            for (const auto& move : getLegalMoves()) {
+            for (const auto& move : getStrategicLegalMoves()) {
                 makeMove(move.x, move.y, CellState::Opponent);
                 int eval = minimax(depth - 1, true, alpha, beta);
                 undoMove(move.x, move.y);
@@ -216,34 +216,35 @@ namespace Gomoku {
             }
         }
 
-        //std::cout << "Cell" << x << "," << y << " count: " << count << " openEnds: " << openEnds << " blockedEnds: " << blockedEnds <<  "type: " <<  (type == CellState::Me ? "Me" : "Opponent") << std::endl << "dir" << dx << "," << dy << std::endl;
         if (type == CellState::Opponent) {
             if (count == 4 && openEnds == 1) {
-                std::cout << "here" << std::endl;
-                return -100000;
+                return -50000;
+            }
+            if (count == 3 && openEnds == 2) {
+                return -50000;
             }
         }
         if (count >= 5) {
             return 1000000;
         } else if (count == 4) {
             if (openEnds == 2) {
-                return 100000;
+                return 50000;
             } else if (openEnds == 1) {
                 return 10000;
             } else if (blockedEnds == 1) {
-                return 1000;
+                return 5000;
             }
         } else if (count == 3) {
             if (openEnds == 2) {
-                return 1000;
+                return 40000;
             } else if (openEnds == 1) {
-                return 100;
+                return 50;
             } else if (blockedEnds == 1) {
-                return 10;
+                return 5;
             }
         } else if (count == 2) {
             if (openEnds == 2) {
-                return 10;
+                return 5;
             } else if (openEnds == 1) {
                 return 1;
             }

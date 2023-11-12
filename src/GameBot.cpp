@@ -195,9 +195,10 @@ bool Gomoku::GameBot::isEndBot() const
     return endBot;
 }
 
+/*
 Gomoku::Move Gomoku::GameBot::calculateBestMove()
 {
-    std::vector<Move> legalMoves = board->getLegalMoves();
+    std::vector<Move> legalMoves = board->getStrategicLegalMoves();
     int bestScore = std::numeric_limits<int>::min();
     Move bestMove{-1, -1};
 
@@ -233,6 +234,26 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
             t.join();
         }
     }
+    return bestMove;
+}*/
+
+Gomoku::Move Gomoku::GameBot::calculateBestMove()
+{
+    std::vector<Move> legalMoves = board->getLegalMoves();
+    int bestScore = std::numeric_limits<int>::min();
+    Move bestMove{-1, -1};
+
+    for (const auto& move : legalMoves) {
+        board->makeMove(move.x, move.y, CellState::Me);
+        int score = board->minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        board->undoMove(move.x, move.y);
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestMove = move;
+        }
+    }
+
     return bestMove;
 }
 

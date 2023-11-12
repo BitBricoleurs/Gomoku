@@ -31,6 +31,8 @@ namespace Gomoku {
 
         void printBoard() const;
 
+        [[nodiscard]] std::vector<Move> getStrategicLegalMoves() const;
+
 
     private:
         int size;
@@ -50,7 +52,5 @@ namespace Gomoku {
         [[nodiscard]] bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
 
         [[nodiscard]] int evaluateCell(int x, int y, CellState player) const;
-
-        [[nodiscard]] std::vector<Move> getStrategicLegalMoves() const;
     };
 }
