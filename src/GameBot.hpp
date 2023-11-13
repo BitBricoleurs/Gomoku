@@ -30,7 +30,7 @@ namespace Gomoku {
 
     class GameBot {
     public:
-        explicit GameBot(bool isPrintGame);
+        GameBot(bool isPrintGame, int valgrindEnable, std::string nameBot);
 
         GameBot() = default;
 
@@ -60,7 +60,7 @@ namespace Gomoku {
 
         Move calculateBestMove();
 
-        static void enforceMemoryLimit();
+        void enforceMemoryLimit() const;
 
         void enforceMatchTimeLimit();
 
@@ -77,6 +77,10 @@ namespace Gomoku {
         bool isPrintGame = false;
 
         bool endBot = false;
+
+        bool valgrindEnabled = false;
+
+        const std::string botName = "GomokuBot";
 
     };
 }

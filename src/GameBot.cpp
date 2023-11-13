@@ -3,9 +3,11 @@
 //
 
 #include "GameBot.hpp"
+
+#include <utility>
 #include "Core.hpp"
 
-Gomoku::GameBot::GameBot(bool isPrintGame) : isPrintGame(isPrintGame)
+Gomoku::GameBot::GameBot(bool isPrintGame, int valgrindEnable, std::string  nameBot) : isPrintGame(isPrintGame), valgrindEnabled(valgrindEnable), botName(std::move(nameBot))
 {
 }
 
@@ -31,8 +33,11 @@ void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono
 }
 
 
-void Gomoku::GameBot::enforceMemoryLimit() {
-    if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
+void Gomoku::GameBot::enforceMemoryLimit() const {
+    if (valgrindEnabled) {
+        return;
+    }
+    if (getMemoryUsage() > maxMemoryMB * 1024 * 1024) {
         std::cerr << "Memory limit exceeded" << std::endl;
         std::exit(EXIT_FAILURE);
     }
@@ -97,7 +102,6 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
         }
         int size = std::stoi(args[0]);
         if (isValidBoardSize(size)) {
-            //std::cout << "Size" << size << std::endl;
             board = std::make_unique<Board>(size);
             respond("OK");
             if (isPrintGame)
@@ -116,8 +120,8 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
     auto startTime = std::chrono::steady_clock::now();
 
     std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
-    Move opponentMove(tokens[0], tokens[1]);
     if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1]) && board->isBoardInit()) {
+        Move opponentMove(tokens[0], tokens[1]);
         board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
 
         Move bestMove = calculateBestMove();
@@ -232,7 +236,9 @@ void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
 
 void Gomoku::GameBot::handleAbout()
 {
-    respond(R"(name="GameBot", author="Alexandre", version="1.0", country="France")");
+    std::ostringstream responseStream;
+    responseStream << R"(name=")" << botName << R"(", author="Alexandre", version="1.0", country="France")";
+    respond(responseStream.str());
 }
 
 bool Gomoku::GameBot::isEndBot() const

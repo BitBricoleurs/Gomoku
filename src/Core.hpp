@@ -23,22 +23,20 @@ namespace Gomoku {
 
     class Core {
         public :
-            explicit Core(bool isPrintGame);
+            Core(bool isPrintGame, bool valgrindEnable, const std::string& nameBot);
             ~Core() = default;
 
             void run();
             static std::vector<std::string> splitString(const std::string& str, char delimiter);
 
         private:
-            GameBot myBot;
+            std::unique_ptr<GameBot> myBot;
 
             bool parseCommand(const std::string& command, const std::vector<std::string>& args);
 
             std::unordered_map<std::string, CommandType> commandMap;
 
             void initializeCommandMap();
-
-            bool isPrintGame;
     };
 
 }
