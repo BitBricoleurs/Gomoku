@@ -61,7 +61,7 @@ size_t Gomoku::GameBot::getMemoryUsage()
 void Gomoku::GameBot::respond(const std::string& response)
 {
     std::cout << response << std::endl;
-    //std::fflush(stdout);
+    std::fflush(stdout);
 }
 
 bool Gomoku::GameBot::isValidBoardSize(int size)
