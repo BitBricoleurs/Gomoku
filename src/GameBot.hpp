@@ -31,6 +31,7 @@ namespace Gomoku {
     class GameBot {
     public:
         explicit GameBot(bool isPrintGame);
+
         GameBot() = default;
 
         void handleStart(const std::vector<std::string>& args);
@@ -42,27 +43,40 @@ namespace Gomoku {
         void handleAbout();
 
         [[nodiscard]] bool isEndBot() const;
+
         static void respond(const std::string& response);
+
         std::map<std::string, std::string> infoMap;
 
     private:
         static size_t getMemoryUsage();
+
         static bool isValidBoardSize(int size);
+
         bool areValidCoordinates(const std::string &xStr, const std::string &yStr);
 
         void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
                                      const std::chrono::time_point<std::chrono::steady_clock> &endTime);
+
         Move calculateBestMove();
+
         static void enforceMemoryLimit();
+
         void enforceMatchTimeLimit();
 
         std::unique_ptr<Board> board;
-        bool endBot = false;
-        int DEPTH = 3;
 
         std::chrono::steady_clock::time_point matchStartTime;
+
         int timeoutMatch = 0;
+
+        int DEPTH = 3;
+
         int maxMemoryMB = MAX_MEMORY_MB;
+
         bool isPrintGame = false;
+
+        bool endBot = false;
+
     };
 }

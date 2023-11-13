@@ -13,13 +13,23 @@ void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono
                                        const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
     auto it = infoMap.find("timeout_turn");
     if (it != infoMap.end()) {
-        int timeout_turn = std::stoi(it->second);
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() > timeout_turn) {
-            std::cerr << "Time limit for move exceeded" << std::endl;
-            std::exit(EXIT_FAILURE);
+        try {
+            int timeout_turn = std::stoi(it->second);
+
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() > timeout_turn) {
+                std::cerr << "Time limit for move exceeded" << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid value for timeout_turn: " << it->second << std::endl;
+            return;
+        } catch (const std::out_of_range& e) {
+            std::cerr << "Value for timeout_turn out of range: " << it->second << std::endl;
+            return;
         }
     }
 }
+
 
 void Gomoku::GameBot::enforceMemoryLimit() {
     if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
@@ -145,8 +155,7 @@ void Gomoku::GameBot::handleBegin()
 
 }
 
-void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
-{
+void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
     board->clear();
 
     for (const auto &line : args) {
@@ -160,16 +169,34 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
         std::string part;
         std::vector<int> moveDetails;
 
-        while (std::getline(iss, part, ',')) {
-            moveDetails.push_back(std::stoi(part));
-        }
+        try {
+            while (std::getline(iss, part, ',')) {
+                moveDetails.push_back(std::stoi(part));
+            }
 
-        if (moveDetails.size() == 3) {
-            int x = moveDetails[0];
-            int y = moveDetails[1];
-            auto state = static_cast<CellState>(moveDetails[2]);
-            board->makeMove(x, y, state);
-        } else {
+            if (moveDetails.size() == 3) {
+                int x = moveDetails[0];
+                int y = moveDetails[1];
+                int stateValue = moveDetails[2];
+
+                if (x >= 0 && x < board->getSize() && y >= 0 && y < board->getSize() &&
+                    stateValue > static_cast<int>(CellState::Empty) &&
+                    stateValue < static_cast<int>(CellState::Error)) {
+
+                    auto state = static_cast<CellState>(stateValue);
+                    board->makeMove(x, y, state);
+                } else {
+                    respond("ERROR invalid board input");
+                    return;
+                }
+            } else {
+                respond("ERROR invalid board input");
+                return;
+            }
+        } catch (const std::invalid_argument& e) {
+            respond("ERROR invalid board input");
+            return;
+        } catch (const std::out_of_range& e) {
             respond("ERROR invalid board input");
             return;
         }
@@ -178,27 +205,28 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
 }
 
 
+
 void Gomoku::GameBot::handleEnd()
 {
     endBot = true;
 }
 
-void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args)
-{
+void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
     for (const auto& arg : args) {
         std::istringstream iss(arg);
         std::string key;
         std::string value;
+
         if (std::getline(iss, key, ' ') && std::getline(iss, value)) {
             infoMap[key] = value;
             if (key == "max_memory") {
-                maxMemoryMB = std::stoi(value) / (1024 * 1024);
+                try {
+                    maxMemoryMB = std::stoi(value) / (1024 * 1024);
+                } catch (const std::exception& e) {
+                }
             }
-        } else {
-            return;
         }
     }
-
     respond("OK - Information updated");
 }
 
