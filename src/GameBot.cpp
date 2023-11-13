@@ -61,7 +61,7 @@ size_t Gomoku::GameBot::getMemoryUsage()
 void Gomoku::GameBot::respond(const std::string& response)
 {
     std::cout << response << std::endl;
-    std::fflush(stdout);
+    //std::fflush(stdout);
 }
 
 bool Gomoku::GameBot::isValidBoardSize(int size)
@@ -97,8 +97,9 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
         }
         int size = std::stoi(args[0]);
         if (isValidBoardSize(size)) {
+            //std::cout << "Size" << size << std::endl;
             board = std::make_unique<Board>(size);
-            respond("OK - everything is good");
+            respond("OK");
             if (isPrintGame)
                 board->printBoard();
         } else {
@@ -227,7 +228,6 @@ void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
             }
         }
     }
-    respond("OK - Information updated");
 }
 
 void Gomoku::GameBot::handleAbout()
