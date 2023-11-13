@@ -7,7 +7,7 @@
 
 namespace Gomoku {
 
-    Board::Board(int size) : size(size), cells(size, std::vector<Cell>(size)) {}
+    Board::Board(int size) : size(size), cells(size, std::vector<Cell>(size)), isBoardInitialized(true) {}
 
     bool Board::isValidMove(int x, int y) const {
         return x >= 0 && x < size && y >= 0 && y < size;
@@ -62,7 +62,7 @@ namespace Gomoku {
     bool Board::isNearbyOccupied(int x, int y) const {
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
-                if (dx == 0 && dy == 0) continue; // Skip the current cell
+                if (dx == 0 && dy == 0) continue;
                 int newX = x + dx, newY = y + dy;
                 if (isValidCoordinate(newX, newY) && cells[newX][newY].get_state() != CellState::Empty) {
                     return true;
@@ -280,7 +280,22 @@ namespace Gomoku {
         }
     }
 
+    int Board::getSize() const
+    {
+        return size;
+    }
 
+    CellState Board::getCellState(int x, int y) const
+    {
+        if (!isValidCoordinate(x, y)) {
+            return CellState::Error;
+        }
+        return cells[x][y].get_state();
+    }
 
+    bool Board::isBoardInit() const
+    {
+        return isBoardInitialized;
+    }
 
 }

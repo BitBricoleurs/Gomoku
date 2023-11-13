@@ -48,7 +48,7 @@ namespace Gomoku {
     private:
         static size_t getMemoryUsage();
         static bool isValidBoardSize(int size);
-        static bool areValidCoordinates(const std::string &xStr, const std::string &yStr);
+        bool areValidCoordinates(const std::string &xStr, const std::string &yStr);
 
         void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
                                      const std::chrono::time_point<std::chrono::steady_clock> &endTime);

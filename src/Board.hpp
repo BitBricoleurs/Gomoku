@@ -33,10 +33,20 @@ namespace Gomoku {
 
         [[nodiscard]] std::vector<Move> getStrategicLegalMoves() const;
 
+        [[nodiscard]] int getSize() const;
+
+        [[nodiscard]] CellState getCellState(int x, int y) const;
+
+        [[nodiscard]] bool isBoardInit() const;
+
 
     private:
         int size;
+
         std::vector<std::vector<Cell>> cells;
+
+        bool isBoardInitialized = false;
+
         [[nodiscard]] bool isValidCoordinate(int x, int y) const;
 
         [[nodiscard]] int evaluate() const;

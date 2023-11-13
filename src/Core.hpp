@@ -31,10 +31,14 @@ namespace Gomoku {
 
         private:
             GameBot myBot;
+
             bool parseCommand(const std::string& command, const std::vector<std::string>& args);
-                std::unordered_map<std::string, CommandType> commandMap;
-                void initializeCommandMap();
-        bool isPrintGame;
+
+            std::unordered_map<std::string, CommandType> commandMap;
+
+            void initializeCommandMap();
+
+            bool isPrintGame;
     };
 
 }

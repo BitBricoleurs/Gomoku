@@ -22,10 +22,10 @@ void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono
 }
 
 void Gomoku::GameBot::enforceMemoryLimit() {
-    /*if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
+    if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
         std::cerr << "Memory limit exceeded" << std::endl;
         std::exit(EXIT_FAILURE);
-    }*/
+    }
 }
 
 size_t Gomoku::GameBot::getMemoryUsage()
@@ -61,10 +61,21 @@ bool Gomoku::GameBot::isValidBoardSize(int size)
 
 bool Gomoku::GameBot::areValidCoordinates(const std::string& xStr, const std::string& yStr)
 {
-    int x = std::stoi(xStr);
-    int y = std::stoi(yStr);
-    return x >= 0 && y >= 0;
+    try {
+        int x = std::stoi(xStr);
+        int y = std::stoi(yStr);
+
+        bool isWithinBounds = x >= 0 && x < board->getSize() && y >= 0 && y <  board->getSize();
+        bool isCellFree = isWithinBounds && board->getCellState(x, y) == CellState::Empty;
+
+        return isWithinBounds && isCellFree;
+    } catch (const std::invalid_argument& e) {
+        return false;
+    } catch (const std::out_of_range& e) {
+        return false;
+    }
 }
+
 
 void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
     if (args.size() == 1) {
@@ -95,7 +106,7 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 
     std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
     Move opponentMove(tokens[0], tokens[1]);
-    if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1])) {
+    if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1]) && board->isBoardInit()) {
         board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
 
         Move bestMove = calculateBestMove();
@@ -117,15 +128,21 @@ void Gomoku::GameBot::handleBegin()
     enforceMatchTimeLimit();
     auto startTime = std::chrono::steady_clock::now();
 
-    Move bestMove = calculateBestMove();
-    board->makeMove(bestMove.x, bestMove.y, CellState::Me);
-    respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
+    if (board->isBoardInit()) {
 
-    auto endTime = std::chrono::steady_clock::now();
-    enforceTimeLimit(startTime, endTime);
-    enforceMemoryLimit();
-    if (isPrintGame)
-        board->printBoard();
+        Move bestMove = calculateBestMove();
+        board->makeMove(bestMove.x, bestMove.y, CellState::Me);
+        respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
+
+        auto endTime = std::chrono::steady_clock::now();
+        enforceTimeLimit(startTime, endTime);
+        enforceMemoryLimit();
+        if (isPrintGame)
+            board->printBoard();
+    } else {
+        respond("ERROR board not initialized");
+    }
+
 }
 
 void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args)
