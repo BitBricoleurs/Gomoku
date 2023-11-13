@@ -4,9 +4,12 @@
 
 #include "Core.hpp"
 
+#include <utility>
+
 namespace Gomoku {
 
-    Core::Core() {
+    Core::Core(bool isPrintGame, bool valgrindEnable, const std::string& nameBot): myBot(std::make_unique<GameBot>(isPrintGame, valgrindEnable, nameBot))
+    {
         initializeCommandMap();
     }
 
@@ -23,7 +26,7 @@ namespace Gomoku {
     void Core::run() {
         std::string line = std::string();
 
-        while (!myBot.isEndBot() && std::getline(std::cin, line)) {
+        while (!myBot->isEndBot() && std::getline(std::cin, line)) {
             if (!line.empty()) {
                 auto tokens = splitString(line, ' ');
                 if (!tokens.empty()) {
@@ -47,30 +50,30 @@ namespace Gomoku {
 
         switch (cmdType) {
             case CommandType::START:
-                myBot.handleStart(args);
+                myBot->handleStart(args);
                 return true;
             case CommandType::TURN:
-                myBot.handleTurn(args);
+                myBot->handleTurn(args);
                 return true;
 
             case CommandType::BEGIN:
-                myBot.handleBegin();
+                myBot->handleBegin();
                 return true;
 
             case CommandType::BOARD:
-                myBot.handleBoard(args);
+                myBot->handleBoard(args);
                 return true;
 
             case CommandType::END:
-                myBot.handleEnd();
+                myBot->handleEnd();
                 return true;
 
             case CommandType::INFO:
-                myBot.handleInfo(args);
+                myBot->handleInfo(args);
                 return true;
 
             case CommandType::ABOUT:
-                myBot.handleAbout();
+                myBot->handleAbout();
                 return true;
 
             default:

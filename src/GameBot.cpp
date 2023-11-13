@@ -3,18 +3,41 @@
 //
 
 #include "GameBot.hpp"
+
+#include <utility>
 #include "Core.hpp"
 
+Gomoku::GameBot::GameBot(bool isPrintGame, int valgrindEnable, std::string  nameBot) : isPrintGame(isPrintGame), valgrindEnabled(valgrindEnable), botName(std::move(nameBot))
+{
+}
+
 void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock>& startTime,
-                               const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
-    if (std::chrono::duration_cast<std::chrono::seconds>(endTime - startTime) > MAX_TIME_PER_MOVE) {
-        std::cerr << "Time limit exceeded" << std::endl;
-        std::exit(EXIT_FAILURE);
+                                       const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
+    auto it = infoMap.find("timeout_turn");
+    if (it != infoMap.end()) {
+        try {
+            int timeout_turn = std::stoi(it->second);
+
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() > timeout_turn) {
+                std::cerr << "Time limit for move exceeded" << std::endl;
+                std::exit(EXIT_FAILURE);
+            }
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Invalid value for timeout_turn: " << it->second << std::endl;
+            return;
+        } catch (const std::out_of_range& e) {
+            std::cerr << "Value for timeout_turn out of range: " << it->second << std::endl;
+            return;
+        }
     }
 }
 
-void Gomoku::GameBot::enforceMemoryLimit() {
-    if (getMemoryUsage() > MAX_MEMORY_MB * 1024 * 1024) {
+
+void Gomoku::GameBot::enforceMemoryLimit() const {
+    if (valgrindEnabled) {
+        return;
+    }
+    if (getMemoryUsage() > maxMemoryMB * 1024 * 1024) {
         std::cerr << "Memory limit exceeded" << std::endl;
         std::exit(EXIT_FAILURE);
     }
@@ -53,18 +76,36 @@ bool Gomoku::GameBot::isValidBoardSize(int size)
 
 bool Gomoku::GameBot::areValidCoordinates(const std::string& xStr, const std::string& yStr)
 {
-    int x = std::stoi(xStr);
-    int y = std::stoi(yStr);
-    return x >= 0 && y >= 0;
+    try {
+        int x = std::stoi(xStr);
+        int y = std::stoi(yStr);
+
+        bool isWithinBounds = x >= 0 && x < board->getSize() && y >= 0 && y <  board->getSize();
+        bool isCellFree = isWithinBounds && board->getCellState(x, y) == CellState::Empty;
+
+        return isWithinBounds && isCellFree;
+    } catch (const std::invalid_argument& e) {
+        return false;
+    } catch (const std::out_of_range& e) {
+        return false;
+    }
 }
+
 
 void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
     if (args.size() == 1) {
-        std::cout << "yes" << std::endl;
+        matchStartTime = std::chrono::steady_clock::now();
+
+        auto it = infoMap.find("timeout_match");
+        if (it != infoMap.end()) {
+            timeoutMatch = std::stoi(it->second);
+        }
         int size = std::stoi(args[0]);
         if (isValidBoardSize(size)) {
             board = std::make_unique<Board>(size);
             respond("OK");
+            if (isPrintGame)
+                board->printBoard();
         } else {
             respond("ERROR unsupported size");
         }
@@ -75,19 +116,23 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
 
 void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 {
+    enforceMatchTimeLimit();
     auto startTime = std::chrono::steady_clock::now();
 
     std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
-    Move opponentMove(tokens[0], tokens[1]);
-    if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1])) {
+    if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1]) && board->isBoardInit()) {
+        Move opponentMove(tokens[0], tokens[1]);
         board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
 
         Move bestMove = calculateBestMove();
+        board->makeMove(bestMove.x, bestMove.y, CellState::Me);
         respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
         auto endTime = std::chrono::steady_clock::now();
         enforceTimeLimit(startTime, endTime);
         enforceMemoryLimit();
+        if (isPrintGame)
+            board->printBoard();
     } else {
         respond("ERROR invalid coordinates");
     }
@@ -95,14 +140,24 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 
 void Gomoku::GameBot::handleBegin()
 {
-    //auto startTime = std::chrono::steady_clock::now();
+    enforceMatchTimeLimit();
+    auto startTime = std::chrono::steady_clock::now();
 
-    Move bestMove = calculateBestMove();
-    respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
+    if (board->isBoardInit()) {
 
-    auto endTime = std::chrono::steady_clock::now();
-    //enforceTimeLimit(startTime, endTime);
-    enforceMemoryLimit();
+        Move bestMove = calculateBestMove();
+        board->makeMove(bestMove.x, bestMove.y, CellState::Me);
+        respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
+
+        auto endTime = std::chrono::steady_clock::now();
+        enforceTimeLimit(startTime, endTime);
+        enforceMemoryLimit();
+        if (isPrintGame)
+            board->printBoard();
+    } else {
+        respond("ERROR board not initialized");
+    }
+
 }
 
 void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
@@ -119,22 +174,41 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
         std::string part;
         std::vector<int> moveDetails;
 
-        while (std::getline(iss, part, ',')) {
-            moveDetails.push_back(std::stoi(part));
-        }
+        try {
+            while (std::getline(iss, part, ',')) {
+                moveDetails.push_back(std::stoi(part));
+            }
 
-        if (moveDetails.size() == 3) {
-            int x = moveDetails[0];
-            int y = moveDetails[1];
-            auto state = static_cast<CellState>(moveDetails[2]);
-            board->makeMove(x, y, state);
-        } else {
+            if (moveDetails.size() == 3) {
+                int x = moveDetails[0];
+                int y = moveDetails[1];
+                int stateValue = moveDetails[2];
+
+                if (x >= 0 && x < board->getSize() && y >= 0 && y < board->getSize() &&
+                    stateValue > static_cast<int>(CellState::Empty) &&
+                    stateValue < static_cast<int>(CellState::Error)) {
+
+                    auto state = static_cast<CellState>(stateValue);
+                    board->makeMove(x, y, state);
+                } else {
+                    respond("ERROR invalid board input");
+                    return;
+                }
+            } else {
+                respond("ERROR invalid board input");
+                return;
+            }
+        } catch (const std::invalid_argument& e) {
+            respond("ERROR invalid board input");
+            return;
+        } catch (const std::out_of_range& e) {
             respond("ERROR invalid board input");
             return;
         }
     }
     respond("ERROR board data incomplete");
 }
+
 
 
 void Gomoku::GameBot::handleEnd()
@@ -147,19 +221,24 @@ void Gomoku::GameBot::handleInfo(const std::vector<std::string> &args) {
         std::istringstream iss(arg);
         std::string key;
         std::string value;
+
         if (std::getline(iss, key, ' ') && std::getline(iss, value)) {
             infoMap[key] = value;
-        } else {
-            return;
+            if (key == "max_memory") {
+                try {
+                    maxMemoryMB = std::stoi(value) / (1024 * 1024);
+                } catch (const std::exception& e) {
+                }
+            }
         }
     }
-
-    respond("OK - Information updated");
 }
 
 void Gomoku::GameBot::handleAbout()
 {
-    respond(R"(name="GameBot", author="Alexandre", version="1.0", country="France")");
+    std::ostringstream responseStream;
+    responseStream << R"(name=")" << botName << R"(", author="Alexandre", version="1.0", country="France")";
+    respond(responseStream.str());
 }
 
 bool Gomoku::GameBot::isEndBot() const
@@ -167,14 +246,57 @@ bool Gomoku::GameBot::isEndBot() const
     return endBot;
 }
 
+/*
 Gomoku::Move Gomoku::GameBot::calculateBestMove()
 {
+    std::vector<Move> legalMoves = board->getStrategicLegalMoves();
     int bestScore = std::numeric_limits<int>::min();
     Move bestMove{-1, -1};
-    for (const auto& move : board->getLegalMoves()) {
+
+    unsigned int numThreads = std::thread::hardware_concurrency();
+    std::vector<std::thread> threads(numThreads);
+
+    std::mutex mutex;
+
+    int movesPerThread = std::ceil(legalMoves.size() / static_cast<double>(numThreads));
+    std::cout << "Moves per thread: " << movesPerThread << std::endl;
+    for (unsigned int i = 0; i < numThreads; ++i) {
+        threads[i] = std::thread([&, i]() {
+            int start = i * movesPerThread;
+            int end = std::min(start + movesPerThread, static_cast<int>(legalMoves.size()));
+
+            for (int j = start; j < end; ++j) {
+                Move move = legalMoves[j];
+                board->makeMove(move.x, move.y, CellState::Me);
+                int score = board->minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+                board->undoMove(move.x, move.y);
+
+                std::lock_guard<std::mutex> lock(mutex);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestMove = move;
+                }
+            }
+        });
+    }
+
+    for (auto& t : threads) {
+        if (t.joinable()) {
+            t.join();
+        }
+    }
+    return bestMove;
+}*/
+
+Gomoku::Move Gomoku::GameBot::calculateBestMove()
+{
+    std::vector<Move> legalMoves = board->getLegalMoves();
+    int bestScore = std::numeric_limits<int>::min();
+    Move bestMove{-1, -1};
+
+    for (const auto& move : legalMoves) {
         board->makeMove(move.x, move.y, CellState::Me);
-        int score = board->minimax(DEPTH, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-        std::cout << "Score for move " << move.x << "," << move.y << " is " << score << std::endl;
+        int score = board->minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
         board->undoMove(move.x, move.y);
 
         if (score > bestScore) {
@@ -182,5 +304,19 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
             bestMove = move;
         }
     }
+
     return bestMove;
+}
+
+
+void Gomoku::GameBot::enforceMatchTimeLimit()
+{
+    if (timeoutMatch > 0) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - matchStartTime).count();
+        if (elapsedTime > timeoutMatch) {
+            std::cerr << "Match time limit exceeded" << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+    }
 }

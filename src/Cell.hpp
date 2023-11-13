@@ -9,7 +9,8 @@ namespace Gomoku {
     enum class CellState {
         Empty,
         Me,
-        Opponent
+        Opponent,
+        Error
     };
 
     class Cell {
