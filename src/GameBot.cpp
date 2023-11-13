@@ -13,24 +13,25 @@ Gomoku::GameBot::GameBot(bool isPrintGame, int valgrindEnable, std::string  name
 
 void Gomoku::GameBot::enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock>& startTime,
                                        const std::chrono::time_point<std::chrono::steady_clock>& endTime) {
+    int timeout_turn = std::chrono::duration_cast<std::chrono::milliseconds>(MAX_TIME_PER_MOVE).count();
+
     auto it = infoMap.find("timeout_turn");
     if (it != infoMap.end()) {
         try {
-            int timeout_turn = std::stoi(it->second);
-
-            if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() > timeout_turn) {
-                std::cerr << "Time limit for move exceeded" << std::endl;
-                std::exit(EXIT_FAILURE);
-            }
+            timeout_turn = std::stoi(it->second);
         } catch (const std::invalid_argument& e) {
-            std::cerr << "Invalid value for timeout_turn: " << it->second << std::endl;
-            return;
+            std::cerr << "Invalid value for timeout_turn, using default: " << it->second << std::endl;
         } catch (const std::out_of_range& e) {
-            std::cerr << "Value for timeout_turn out of range: " << it->second << std::endl;
-            return;
+            std::cerr << "Value for timeout_turn out of range, using default: " << it->second << std::endl;
         }
     }
+
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() > timeout_turn) {
+        std::cerr << "Time limit for move exceeded" << std::endl;
+        std::exit(EXIT_FAILURE);
+    }
 }
+
 
 
 void Gomoku::GameBot::enforceMemoryLimit() const {
@@ -103,6 +104,7 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
         int size = std::stoi(args[0]);
         if (isValidBoardSize(size)) {
             board = std::make_unique<Board>(size);
+            isBoardInit = true;
             respond("OK");
             if (isPrintGame)
                 board->printBoard();
@@ -120,7 +122,7 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
     auto startTime = std::chrono::steady_clock::now();
 
     std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
-    if (tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1]) && board->isBoardInit()) {
+    if (isBoardInit && tokens.size() == 2 && areValidCoordinates(tokens[0], tokens[1])) {
         Move opponentMove(tokens[0], tokens[1]);
         board->makeMove(opponentMove.x, opponentMove.y, CellState::Opponent);
 
@@ -143,7 +145,7 @@ void Gomoku::GameBot::handleBegin()
     enforceMatchTimeLimit();
     auto startTime = std::chrono::steady_clock::now();
 
-    if (board->isBoardInit()) {
+    if (isBoardInit) {
 
         Move bestMove = calculateBestMove();
         board->makeMove(bestMove.x, bestMove.y, CellState::Me);
@@ -290,13 +292,15 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
 
 Gomoku::Move Gomoku::GameBot::calculateBestMove()
 {
-    std::vector<Move> legalMoves = board->getLegalMoves();
+    std::vector<Move> legalMoves = board->getStrategicLegalMoves();
     int bestScore = std::numeric_limits<int>::min();
     Move bestMove{-1, -1};
 
     for (const auto& move : legalMoves) {
         board->makeMove(move.x, move.y, CellState::Me);
-        int score = board->minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        int score = minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        std::cout << "Score: " << score << std::endl;
+        std::cout << "Move: " << move.x << " " << move.y << std::endl;
         board->undoMove(move.x, move.y);
 
         if (score > bestScore) {
@@ -304,8 +308,106 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
             bestMove = move;
         }
     }
-
     return bestMove;
+}
+
+
+int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int beta)
+{
+    if (depth == 0 || board->isGameOver()) {
+        return evaluate();
+    }
+
+    if (isMaximizingPlayer) {
+        int maxEval = std::numeric_limits<int>::min();
+        for (const auto& move : board->getStrategicLegalMoves()) {
+            board->makeMove(move.x, move.y, CellState::Me);
+            int eval = minimax(depth - 1, false, alpha, beta);
+            board->undoMove(move.x, move.y);
+            maxEval = std::max(maxEval, eval);
+            alpha = std::max(alpha, eval);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return maxEval;
+    } else {
+        int minEval = std::numeric_limits<int>::max();
+        for (const auto& move : board->getStrategicLegalMoves()) {
+            board->makeMove(move.x, move.y, CellState::Opponent);
+            int eval = minimax(depth - 1, true, alpha, beta);
+            board->undoMove(move.x, move.y);
+            minEval = std::min(minEval, eval);
+            beta = std::min(beta, eval);
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return minEval;
+    }
+}
+
+int Gomoku::GameBot::evaluate() {
+    int score = 0;
+    for (int x = 0; x < board->getSize(); ++x) {
+        for (int y = 0; y <  board->getSize(); ++y) {
+            CellState player = board->getCellState(x,y);
+            if (player != CellState::Empty) {
+                score += evaluateCell(x, y, player);
+            }
+        }
+    }
+    return score;
+}
+
+int Gomoku::GameBot::evaluateCell(int x, int y, CellState type) {
+    int score = 0;
+
+    score += evaluateLine(x, y, 1, 0, type);
+    score += evaluateLine(x, y, 0, 1, type);
+    score += evaluateLine(x, y, 1, 1, type);
+    score += evaluateLine(x, y, -1, 1, type);
+
+    return score;
+}
+
+int Gomoku::GameBot::countConsecutiveStones(int x, int y, int dx, int dy, CellState type) {
+    int count = 0;
+    int i = 1;
+    while (board->isValidCoordinate(x + i*dx, y + i*dy) && board->getCellState(x + i*dx, y + i*dy) == type) {
+        count++;
+        i++;
+    }
+    return count;
+}
+
+void Gomoku::GameBot::checkEnds(int x, int y, int dx, int dy, CellState type, int& openEnds, int& blockedEnds) {
+    if (!board->isValidCoordinate(x, y)) {
+        blockedEnds++;
+    } else if (board->getCellState(x, y) == CellState::Empty) {
+        openEnds++;
+    } else if (board->getCellState(x, y) != type) {
+        blockedEnds++;
+    }
+}
+
+
+int Gomoku::GameBot::evaluateLine(int x, int y, int dx, int dy, CellState type) {
+    int count = countConsecutiveStones(x, y, dx, dy, type);
+    int openEnds = 0;
+    int blockedEnds = 0;
+
+    checkEnds(x + (count + 1) * dx, y + (count + 1) * dy, dx, dy, type, openEnds, blockedEnds);
+
+    checkEnds(x - dx, y - dy, dx, dy, type, openEnds, blockedEnds);
+
+    LineConfig config = {count, openEnds, blockedEnds};
+
+    auto it = scoreMap.find(config);
+    if (it != scoreMap.end()) {
+        return (type == CellState::Me) ? it->second : -(it->second);
+    }
+    return 0;
 }
 
 

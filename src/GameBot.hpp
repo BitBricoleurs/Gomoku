@@ -22,6 +22,7 @@
 #endif
 
 #include "Board.hpp"
+#include "LineConfigHash.hpp"
 
     constexpr int MAX_MEMORY_MB = 70;
     constexpr std::chrono::seconds MAX_TIME_PER_MOVE(5);
@@ -49,6 +50,26 @@ namespace Gomoku {
         std::map<std::string, std::string> infoMap;
 
     private:
+
+        std::unordered_map<LineConfig, int, LineConfigHash> scoreMap = {
+
+                {{5, 2, 0}, 100000},
+                {{4, 2, 0}, 50000},
+                {{4, 1, 0}, 10000},
+                {{3, 2, 0}, 5000},
+                {{3, 1, 0}, 1000},
+
+                {{4, 2, 1}, 20000},
+                {{4, 1, 1}, 15000},
+                {{3, 2, 1}, 7500},
+                {{3, 1, 1}, 3000},
+                {{2, 2, 0}, 500},
+                {{2, 1, 0}, 200},
+
+                {{3, 2, 1}, 4000},
+                {{2, 2, 1}, 1000},
+        };
+
         static size_t getMemoryUsage();
 
         static bool isValidBoardSize(int size);
@@ -70,7 +91,7 @@ namespace Gomoku {
 
         int timeoutMatch = 0;
 
-        int DEPTH = 3;
+        int DEPTH = 2;
 
         int maxMemoryMB = MAX_MEMORY_MB;
 
@@ -80,7 +101,20 @@ namespace Gomoku {
 
         bool valgrindEnabled = false;
 
+        bool isBoardInit = false;
+
         const std::string botName = "GomokuBot";
 
+        int evaluateLine(int x, int y, int dx, int dy, CellState type) ;
+
+        int evaluateCell(int x, int y, CellState type) ;
+
+        int evaluate();
+
+        int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
+
+        int countConsecutiveStones(int x, int y, int dx, int dy, CellState type);
+
+        void checkEnds(int x, int y, int dx, int dy, CellState type, int &openEnds, int &blockedEnds);
     };
 }

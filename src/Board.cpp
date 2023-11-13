@@ -7,7 +7,7 @@
 
 namespace Gomoku {
 
-    Board::Board(int size) : size(size), cells(size, std::vector<Cell>(size)), isBoardInitialized(true) {}
+    Board::Board(int size) : size(size), cells(size, std::vector<Cell>(size)) {}
 
     bool Board::isValidMove(int x, int y) const {
         return x >= 0 && x < size && y >= 0 && y < size;
@@ -102,156 +102,6 @@ namespace Gomoku {
         return true;
     }
 
-    bool Board::isGameOverFor(CellState type) const
-    {
-        for (int x = 0; x < size; ++x) {
-            for (int y = 0; y < size; ++y) {
-                if (cells[x][y].get_state() == type) {
-                    if (checkDirection(x, y, 1, 0, type) ||
-                        checkDirection(x, y, 0, 1, type) ||
-                        checkDirection(x, y, 1, 1, type) ||
-                        checkDirection(x, y, 1, -1, type)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    int Board::minimax(int depth, bool isMaximizingPlayer, int alpha, int beta)
-    {
-        if (depth == 0 || isGameOver()) {
-            return evaluate();
-        }
-
-        if (isMaximizingPlayer) {
-            int maxEval = std::numeric_limits<int>::min();
-            for (const auto& move : getStrategicLegalMoves()) {
-                makeMove(move.x, move.y, CellState::Me);
-                int eval = minimax(depth - 1, false, alpha, beta);
-                undoMove(move.x, move.y);
-                maxEval = std::max(maxEval, eval);
-                alpha = std::max(alpha, eval);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-            return maxEval;
-        } else {
-            int minEval = std::numeric_limits<int>::max();
-            for (const auto& move : getStrategicLegalMoves()) {
-                makeMove(move.x, move.y, CellState::Opponent);
-                int eval = minimax(depth - 1, true, alpha, beta);
-                undoMove(move.x, move.y);
-                minEval = std::min(minEval, eval);
-                beta = std::min(beta, eval);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-            return minEval;
-        }
-    }
-
-    int Board::evaluate() const {
-        int score = 0;
-        for (int x = 0; x < size; ++x) {
-            for (int y = 0; y < size; ++y) {
-                CellState player = cells[x][y].get_state();
-                if (player != CellState::Empty) {
-
-                    if (player == CellState::Me) {
-                        score += evaluateCell(x, y, player);
-                    } else {
-                        score -= evaluateCell(x, y, player);
-                    }
-                }
-            }
-        }
-        return score;
-    }
-
-    int Board::evaluateCell(int x, int y, CellState type) const {
-        int score = 0;
-
-        score += evaluateLine(x, y, 1, 0, type);
-        score += evaluateLine(x, y, 0, 1, type);
-        score += evaluateLine(x, y, 1, 1, type);
-        score += evaluateLine(x, y, -1, 1, type);
-
-        return score;
-    }
-
-    int Board::evaluateLine(int x, int y, int dx, int dy, CellState type) const {
-        int count = 0;
-        int openEnds = 0;
-        int blockedEnds = 0;
-
-        int i = 1;
-        while (isValidCoordinate(x + i*dx, y + i*dy)) {
-            if (cells[x + i*dx][y + i*dy].get_state() == type) {
-                count++;
-                i++;
-            } else if (cells[x + i*dx][y + i*dy].get_state() == CellState::Empty) {
-                openEnds++;
-                break;
-            } else {
-                blockedEnds++;
-                break;
-            }
-        }
-
-        i = 1;
-        while (isValidCoordinate(x - i*dx, y - i*dy)) {
-            if (cells[x - i*dx][y - i*dy].get_state() == type) {
-                count++;
-                i++;
-            } else if (cells[x - i*dx][y - i*dy].get_state() == CellState::Empty) {
-                openEnds++;
-                break;
-            } else {
-                blockedEnds++;
-                break;
-            }
-        }
-
-        if (type == CellState::Opponent) {
-            if (count == 4 && openEnds == 1) {
-                return -50000;
-            }
-            if (count == 3 && openEnds == 2) {
-                return -50000;
-            }
-        }
-        if (count >= 5) {
-            return 1000000;
-        } else if (count == 4) {
-            if (openEnds == 2) {
-                return 50000;
-            } else if (openEnds == 1) {
-                return 10000;
-            } else if (blockedEnds == 1) {
-                return 5000;
-            }
-        } else if (count == 3) {
-            if (openEnds == 2) {
-                return 40000;
-            } else if (openEnds == 1) {
-                return 50;
-            } else if (blockedEnds == 1) {
-                return 5;
-            }
-        } else if (count == 2) {
-            if (openEnds == 2) {
-                return 5;
-            } else if (openEnds == 1) {
-                return 1;
-            }
-        }
-        return 0;
-    }
-
     bool Board::isValidCoordinate(int x, int y) const
     {
         return x >= 0 && x < size && y >= 0 && y < size;
@@ -292,10 +142,4 @@ namespace Gomoku {
         }
         return cells[x][y].get_state();
     }
-
-    bool Board::isBoardInit() const
-    {
-        return isBoardInitialized;
-    }
-
 }
