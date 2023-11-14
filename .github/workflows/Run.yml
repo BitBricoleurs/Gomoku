@@ -17,6 +17,13 @@ jobs:
         run: |
           unzip package.rpm
 
+      - name: Install GCC-11
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y gcc-11 g++-11
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 100
+
       - name: Build Liskvork
         run: |
           cd liskvork-0.1.1
