@@ -27,8 +27,6 @@ namespace Gomoku {
 
         [[nodiscard]] std::vector<Move> getLegalMoves() const;
 
-        int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
-
         void printBoard() const;
 
         [[nodiscard]] std::vector<Move> getStrategicLegalMoves() const;
@@ -37,30 +35,18 @@ namespace Gomoku {
 
         [[nodiscard]] CellState getCellState(int x, int y) const;
 
-        [[nodiscard]] bool isBoardInit() const;
+        [[nodiscard]] bool isGameOver() const;
 
+        [[nodiscard]] bool isValidCoordinate(int x, int y) const;
 
     private:
         int size;
 
         std::vector<std::vector<Cell>> cells;
 
-        bool isBoardInitialized = false;
-
-        [[nodiscard]] bool isValidCoordinate(int x, int y) const;
-
-        [[nodiscard]] int evaluate() const;
-
-        [[nodiscard]] int evaluateLine(int x, int y, int dx, int dy, CellState type) const;
-
-        [[nodiscard]] bool isGameOver() const;
-
         [[nodiscard]] bool isNearbyOccupied(int x, int y) const;
-
-        [[nodiscard]] bool isGameOverFor(CellState type) const;
 
         [[nodiscard]] bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
 
-        [[nodiscard]] int evaluateCell(int x, int y, CellState player) const;
     };
 }
