@@ -46,8 +46,7 @@ namespace Gomoku {
         return legalMoves;
     }
 
-    std::vector<Move> Board::getStrategicLegalMoves() const
-    {
+    std::vector<Move> Board::getStrategicLegalMoves() const {
         std::vector<Move> legalMoves;
         for (int x = 0; x < size; ++x) {
             for (int y = 0; y < size; ++y) {
@@ -56,8 +55,25 @@ namespace Gomoku {
                 }
             }
         }
+        if (legalMoves.empty()) {
+            int centerX = size / 2;
+            int centerY = size / 2;
+            if (cells[centerX][centerY].get_state() == CellState::Empty) {
+                legalMoves.emplace_back(centerX, centerY);
+            } else {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    for (int dy = -1; dy <= 1; ++dy) {
+                        if (isValidCoordinate(centerX + dx, centerY + dy) &&
+                            cells[centerX + dx][centerY + dy].get_state() == CellState::Empty) {
+                            legalMoves.emplace_back(centerX + dx, centerY + dy);
+                        }
+                    }
+                }
+            }
+        }
         return legalMoves;
     }
+
 
     bool Board::isNearbyOccupied(int x, int y) const {
         for (int dx = -1; dx <= 1; ++dx) {

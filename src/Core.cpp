@@ -25,11 +25,42 @@ namespace Gomoku {
         commandMap["ABOUT"] = CommandType::ABOUT;
     }
 
+    std::string Core::trim(const std::string& str) {
+        size_t first = str.find_first_not_of(" \t\n");
+        if (first == std::string::npos)
+            return "";
+        size_t last = str.find_last_not_of(" \t\n");
+        return str.substr(first, (last - first + 1));
+    }
+
     void Core::run() {
-        std::string line = std::string();
+        std::string line;
+        bool isBoardCommand = false;
+        std::vector<std::string> boardLines;
 
         while (!myBot->isEndBot() && std::getline(std::cin, line)) {
-            if (!line.empty()) {
+
+            line = trim(line);
+
+            if (line.empty()) continue;
+
+            if (line == "BOARD") {
+                isBoardCommand = true;
+                boardLines.clear();
+                continue;
+            }
+
+            if (isBoardCommand) {
+                if (line == "DONE") {
+                    boardLines.push_back(line);
+                    isBoardCommand = false;
+                    if (!parseCommand("BOARD", boardLines)) {
+                        Gomoku::GameBot::respond("UNKNOWN");
+                    }
+                } else {
+                    boardLines.push_back(line);
+                }
+            } else {
                 auto tokens = splitString(line, ' ');
                 if (!tokens.empty()) {
                     std::string command = tokens.front();
@@ -41,6 +72,7 @@ namespace Gomoku {
             }
         }
     }
+
 
     bool Gomoku::Core::parseCommand(const std::string& command, const std::vector<std::string>& args) {
         if (commandMap.empty()) {

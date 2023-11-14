@@ -116,5 +116,9 @@ namespace Gomoku {
         int countConsecutiveStones(int x, int y, int dx, int dy, CellState type);
 
         void checkEnds(int x, int y, int dx, int dy, CellState type, int &openEnds, int &blockedEnds);
+
+        bool isValidMove(const std::vector<int> &moveDetails);
+
+        static std::vector<int> parseLineToMoveDetails(const std::string &line);
     };
 }
