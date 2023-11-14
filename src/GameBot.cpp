@@ -5,6 +5,8 @@
 #include "GameBot.hpp"
 
 #include <utility>
+#include <iostream>
+#include <sstream>
 #include "Core.hpp"
 
 Gomoku::GameBot::GameBot(bool isPrintGame, int valgrindEnable, std::string  nameBot) : isPrintGame(isPrintGame), valgrindEnabled(valgrindEnable), botName(std::move(nameBot))
@@ -118,7 +120,7 @@ void Gomoku::GameBot::handleStart(const std::vector<std::string>& args) {
 
 void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 {
-    enforceMatchTimeLimit();
+    // enforceMatchTimeLimit();
     auto startTime = std::chrono::steady_clock::now();
 
     std::vector<std::string> tokens = Gomoku::Core::splitString(args[0], ',');
@@ -131,8 +133,8 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
         respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
         auto endTime = std::chrono::steady_clock::now();
-        enforceTimeLimit(startTime, endTime);
-        enforceMemoryLimit();
+        // enforceTimeLimit(startTime, endTime);
+        // enforceMemoryLimit();
         if (isPrintGame)
             board->printBoard();
     } else {
@@ -142,7 +144,7 @@ void Gomoku::GameBot::handleTurn(const std::vector<std::string>& args)
 
 void Gomoku::GameBot::handleBegin()
 {
-    enforceMatchTimeLimit();
+    // enforceMatchTimeLimit();
     auto startTime = std::chrono::steady_clock::now();
 
     if (isBoardInit) {
@@ -152,8 +154,8 @@ void Gomoku::GameBot::handleBegin()
         respond(std::to_string(bestMove.x) + "," + std::to_string(bestMove.y));
 
         auto endTime = std::chrono::steady_clock::now();
-        enforceTimeLimit(startTime, endTime);
-        enforceMemoryLimit();
+        // enforceTimeLimit(startTime, endTime);
+        // enforceMemoryLimit();
         if (isPrintGame)
             board->printBoard();
     } else {

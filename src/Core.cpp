@@ -5,6 +5,8 @@
 #include "Core.hpp"
 
 #include <utility>
+#include <iostream>
+#include <sstream>
 
 namespace Gomoku {
 
