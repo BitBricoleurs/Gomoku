@@ -13,21 +13,17 @@ jobs:
         run: |
           sudo apt-get update
 
-      - name: Curl Zip Package
+      - name: Curl Static Bin
         run: |
-          curl -L -o package.zip https://gitlab.com/huntears/liskvork/-/archive/0.1.1/liskvork-0.1.1.zip
+          curl -L -o liskvork https://cdn.kreog.com/s/Nt7ayTXWctGkn6i/download/liskvork
 
-      - name: Unzip Package 
-        run: |
-          unzip package.zip
-
-      - name: Build Liskvork
-        run: |
-          cd liskvork-0.1.1
-          cmake .
-          make
-          cd ..
-          ls
+    #   - name: Build Liskvork
+    #     run: |
+    #       cd liskvork-0.1.1
+    #       cmake .
+    #       make
+    #       cd ..
+    #       ls
 
       - name: Build pbrain-gomoku-ai
         run: |
@@ -35,11 +31,11 @@ jobs:
 
       - name: Help liskvork
         run: |
-            ./liskvork-0.1.1/bin/liskvork -h
+            ./liskvork -h
         
       - name: Run ai
         run: |
             ls
-            ./liskvork-0.1.1/bin/liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai
+            ./liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai
           
           
