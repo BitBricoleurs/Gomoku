@@ -40,6 +40,6 @@ jobs:
       - name: Run ai
         run: |
             ls
-            ./liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai --headless
+            ./liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai --headless --debug-enable
           
           
