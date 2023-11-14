@@ -174,45 +174,56 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
             return;
         }
 
-        std::istringstream iss(line);
-        std::string part;
-        std::vector<int> moveDetails;
+        std::vector<int> moveDetails = parseLineToMoveDetails(line);
 
-        try {
-            while (std::getline(iss, part, ',')) {
-                moveDetails.push_back(std::stoi(part));
-            }
-
-            if (moveDetails.size() == 3) {
-                int x = moveDetails[0];
-                int y = moveDetails[1];
-                int stateValue = moveDetails[2];
-
-                if (x >= 0 && x < board->getSize() && y >= 0 && y < board->getSize() &&
-                    stateValue > static_cast<int>(CellState::Empty) &&
-                    stateValue < static_cast<int>(CellState::Error)) {
-
-                    auto state = static_cast<CellState>(stateValue);
-                    board->makeMove(x, y, state);
-                } else {
-                    respond("ERROR invalid board input");
-                    return;
-                }
-            } else {
-                respond("ERROR invalid board input");
-                return;
-            }
-        } catch (const std::invalid_argument& e) {
-            respond("ERROR invalid board input");
-            return;
-        } catch (const std::out_of_range& e) {
+        if (isValidMove(moveDetails)) {
+            int x = moveDetails[0];
+            int y = moveDetails[1];
+            auto state = static_cast<CellState>(moveDetails[2]);
+            board->makeMove(x, y, state);
+        } else {
             respond("ERROR invalid board input");
             return;
         }
     }
+
+    if (isPrintGame)
+        board->printBoard();
     respond("ERROR board data incomplete");
 }
 
+std::vector<int> Gomoku::GameBot::parseLineToMoveDetails(const std::string &line) {
+    std::istringstream iss(line);
+    std::string part;
+    std::vector<int> moveDetails;
+
+    while (std::getline(iss, part, ',')) {
+        try {
+            moveDetails.push_back(std::stoi(part));
+        } catch (const std::invalid_argument& e) {
+            return {};
+        } catch (const std::out_of_range& e) {
+            return {};
+        }
+    }
+
+    return moveDetails;
+}
+
+bool Gomoku::GameBot::isValidMove(const std::vector<int> &moveDetails) {
+    if (moveDetails.size() != 3) {
+        return false;
+    }
+
+    int x = moveDetails[0];
+    int y = moveDetails[1];
+    int stateValue = moveDetails[2];
+
+    return x >= 0 && x < board->getSize() &&
+           y >= 0 && y < board->getSize() &&
+           stateValue > static_cast<int>(CellState::Empty) &&
+           stateValue < static_cast<int>(CellState::Error);
+}
 
 
 void Gomoku::GameBot::handleEnd()
@@ -301,8 +312,6 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
     for (const auto& move : legalMoves) {
         board->makeMove(move.x, move.y, CellState::Me);
         int score = minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-        std::cout << "Score: " << score << std::endl;
-        std::cout << "Move: " << move.x << " " << move.y << std::endl;
         board->undoMove(move.x, move.y);
 
         if (score > bestScore) {
