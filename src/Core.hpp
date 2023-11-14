@@ -37,6 +37,8 @@ namespace Gomoku {
             std::unordered_map<std::string, CommandType> commandMap;
 
             void initializeCommandMap();
+
+        std::string trim(const std::string &str);
     };
 
 }
