@@ -1,0 +1,41 @@
+name: Run Gomoku
+
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Curl Zip Package
+        run: |
+          curl -L -o package.rpm https://gitlab.com/huntears/liskvork/-/archive/0.1.1/liskvork-0.1.1.zip
+
+      - name: Unzip Package 
+        run: |
+          unzip package.rpm
+
+      - name: Build Liskvork
+        run: |
+          cd liskvork-0.1.1
+          cmake .
+          make
+          cd ..
+          ls
+
+      - name: Build pbrain-gomoku-ai
+        run: |
+            make
+
+      - name: Help liskvork
+        run: |
+            ./liskvork-0.1.1/bin/liskvork -h
+        
+      - name: Run ai
+        run: |
+            ls
+            ./liskvork-0.1.1/bin/liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai
+          
+          
