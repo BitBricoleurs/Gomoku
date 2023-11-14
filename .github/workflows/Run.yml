@@ -4,14 +4,14 @@ on: [push]
 
 jobs:
   build-and-test:
-    runs-on: fedora-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Update Packages
+      - name: Update apt-get
         run: |
-          sudo dnf update -y
+          sudo apt-get update
 
       - name: Curl Zip Package
         run: |
