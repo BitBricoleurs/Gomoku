@@ -5,6 +5,8 @@
 #include "GameBot.hpp"
 
 #include <utility>
+#include <iostream>
+#include <sstream>
 #include "Core.hpp"
 
 Gomoku::GameBot::GameBot(bool isPrintGame, int valgrindEnable, std::string  nameBot) : isPrintGame(isPrintGame), valgrindEnabled(valgrindEnable), botName(std::move(nameBot))
