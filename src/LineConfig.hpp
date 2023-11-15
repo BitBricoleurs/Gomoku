@@ -6,6 +6,7 @@ struct LineConfig {
     int count;
     int openEnds;
     int blockedEnds;
+    bool holes;
 
     bool operator==(const LineConfig& other) const;
 };

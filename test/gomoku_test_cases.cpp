@@ -75,7 +75,7 @@ std::string executeAI(const std::string& commands, int timeoutSeconds = 5)
 
 
 
-TEST(GomokuTest, ExampleTest) {
+TEST(GomokuTest, test_winning_move) {
     std::string commands = readTestFile("scripts/test_winning_move.txt");
     if (commands.empty()) {
         FAIL() << "Test file not found";
@@ -83,4 +83,14 @@ TEST(GomokuTest, ExampleTest) {
 
     std::string aiResponse = executeAI(commands);
     EXPECT_EQ(aiResponse, "OK\n0,4\n");
+}
+
+TEST(GomokuTest, test_defense_decision) {
+    std::string commands = readTestFile("scripts/test_defense_decision.txt");
+    if (commands.empty()) {
+        FAIL() << "Test file not found";
+    }
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n4,6\n");
 }

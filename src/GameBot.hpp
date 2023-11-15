@@ -53,21 +53,24 @@ namespace Gomoku {
 
         std::unordered_map<LineConfig, int, LineConfigHash> scoreMap = {
 
-                {{5, 2, 0}, 100000},
-                {{4, 2, 0}, 50000},
-                {{4, 1, 0}, 10000},
-                {{3, 2, 0}, 5000},
-                {{3, 1, 0}, 1000},
+                {{5, 2, 0, false}, 100000},
+                {{4, 2, 0, false}, 50000},
+                {{4, 1, 0, false}, 10000},
+                {{3, 2, 0, false}, 5000},
+                {{3, 1, 0, false}, 1000},
 
-                {{4, 2, 1}, 20000},
-                {{4, 1, 1}, 15000},
-                {{3, 2, 1}, 7500},
-                {{3, 1, 1}, 3000},
-                {{2, 2, 0}, 500},
-                {{2, 1, 0}, 200},
+                {{4, 2, 1, false}, 20000},
+                {{4, 1, 1, false}, 15000},
+                {{3, 2, 1, false}, 7500},
+                {{3, 2, 1, false}, 4000},
+                {{3, 1, 1, false}, 3000},
+                {{3, 2, 0, true}, 3000},
+                {{3, 2, 1, true}, 3000},
+                {{3, 1, 0, true}, 1500},
+                {{2, 2, 1, false}, 1000},
+                {{2, 2, 0, false}, 500},
+                {{2, 1, 0, false}, 200},
 
-                {{3, 2, 1}, 4000},
-                {{2, 2, 1}, 1000},
         };
 
         static size_t getMemoryUsage();
@@ -113,12 +116,12 @@ namespace Gomoku {
 
         int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
 
-        int countConsecutiveStones(int x, int y, int dx, int dy, CellState type);
-
         void checkEnds(int x, int y, int dx, int dy, CellState type, int &openEnds, int &blockedEnds);
 
         bool isValidMove(const std::vector<int> &moveDetails);
 
         static std::vector<int> parseLineToMoveDetails(const std::string &line);
+
+        int countConsecutiveStones(int x, int y, int dx, int dy, CellState type, bool &hasHole);
     };
 }
