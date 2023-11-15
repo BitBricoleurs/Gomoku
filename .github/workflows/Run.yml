@@ -42,11 +42,17 @@ jobs:
             ls
             ./liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai --headless --debug-enable
             exit_code=$?
-            if [ $exit_code -eq 0 ] || [ $exit_code -eq 1 ] || [ $exit_code -eq 2 ]; then
-                echo "Game completed successfully"
-                exit 0
+            if [ $exit_code -eq 0 ]; then
+              echo "The game ended in a draw."
+              exit 0
+            elif [ $exit_code -eq 1 ]; then
+              echo "Player1 (GomokuBot) won!"
+              exit 0
+            elif [ $exit_code -eq 2 ]; then
+              echo "Player2 (GomokuBot) won!"
+              exit 0
             else
-                echo "An error occurred"
-                exit $exit_code
+              echo "An error occurred."
+              exit $exit_code
             fi
           
