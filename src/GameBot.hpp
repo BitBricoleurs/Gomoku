@@ -91,7 +91,7 @@ namespace Gomoku {
 
         int timeoutMatch = 0;
 
-        int DEPTH = 2;
+        int DEPTH = 3;
 
         int maxMemoryMB = MAX_MEMORY_MB;
 
