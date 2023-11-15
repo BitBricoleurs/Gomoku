@@ -21,14 +21,6 @@ jobs:
         run: |
           sudo chmod +x liskvork
 
-    #   - name: Build Liskvork
-    #     run: |
-    #       cd liskvork-0.1.1
-    #       cmake .
-    #       make
-    #       cd ..
-    #       ls
-
       - name: Build pbrain-gomoku-ai
         run: |
             make
