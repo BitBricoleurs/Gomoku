@@ -40,7 +40,7 @@ jobs:
       - name: Run ai
         run: |
             ls
-            ./liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai --headless --debug-enable
+            ./liskvork --player1-exe ./build/pbrain-gomoku-ai --player2-exe ./build/pbrain-gomoku-ai --headless --debug-enable || exit_code=$?
             exit_code=$?
             if [ $exit_code -eq 0 ]; then
               echo "The game ended in a draw."
