@@ -64,7 +64,7 @@ std::string executeAI(const std::string& commands, int timeoutSeconds = 5)
                     break;
                 }
             }
-            usleep(100000);
+            usleep(1000000);
         }
 
         close(pipe_out[0]);
@@ -93,4 +93,68 @@ TEST(GomokuTest, test_defense_decision) {
 
     std::string aiResponse = executeAI(commands);
     EXPECT_EQ(aiResponse, "OK\n4,6\n");
+}
+
+TEST(GomokuTest, StrategicResponseTest) {
+    std::string commands = readTestFile("scripts/opportunity_creation_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n5,4\n");
+}
+
+TEST(GomokuTest, ComplexConfig) {
+    std::string commands = readTestFile("scripts/complex_configuration_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n8,7\n");
+}
+
+TEST(GomokuTest, AnticipationTrap) {
+    std::string commands = readTestFile("scripts/anticipation_trap_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n5,5\n");
+}
+
+TEST(GomokuTest, CriticalSituation) {
+    std::string commands = readTestFile("scripts/critical_situation_response_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n14,14\n");
+}
+
+TEST(GomokuTest, MultipleOpportunities1) {
+    std::string commands = readTestFile("scripts/multiple_opportunities_management_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n3,5\n");
+}
+
+TEST(GomokuTest, MultipleOpportunities2) {
+    std::string commands = readTestFile("scripts/multiple_opportunities_management_test2.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n4,5\n");
+}
+
+TEST(GomokuTest, JesusTest) {
+    std::string commands = readTestFile("scripts/test_jesus_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n3,2\n");
+}
+
+TEST(GomokuTest, DefenseAndAttack) {
+    std::string commands = readTestFile("scripts/defense_and_counterattack_test.txt");
+    ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+    std::string aiResponse = executeAI(commands);
+    EXPECT_EQ(aiResponse, "OK\n5,3\n");
 }
