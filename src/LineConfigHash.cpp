@@ -4,6 +4,9 @@
 
 #include "LineConfigHash.hpp"
 
-std::size_t LineConfigHash::operator()(const LineConfig& lc) const {
-    return std::hash<int>()(lc.count) ^ std::hash<int>()(lc.openEnds) ^ std::hash<int>()(lc.blockedEnds);
+size_t LineConfigHash::operator()(const LineConfig& config) const {
+    return std::hash<int>()(config.count) ^
+           std::hash<int>()(config.openEnds) ^
+           std::hash<int>()(config.blockedEnds) ^
+           std::hash<bool>()(config.holes);
 }

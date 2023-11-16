@@ -170,7 +170,10 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
     for (const auto &line : args) {
         if (line == "DONE") {
             Move nextMove = calculateBestMove();
+            board->makeMove(nextMove.x, nextMove.y, CellState::Me);
             respond(std::to_string(nextMove.x) + "," + std::to_string(nextMove.y));
+            if (isPrintGame)
+                board->printBoard();
             return;
         }
 
@@ -187,8 +190,6 @@ void Gomoku::GameBot::handleBoard(const std::vector<std::string> &args) {
         }
     }
 
-    if (isPrintGame)
-        board->printBoard();
     respond("ERROR board data incomplete");
 }
 
@@ -274,25 +275,34 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
     std::mutex mutex;
 
     int movesPerThread = std::ceil(legalMoves.size() / static_cast<double>(numThreads));
-    std::cout << "Moves per thread: " << movesPerThread << std::endl;
-    for (unsigned int i = 0; i < numThreads; ++i) {
-        threads[i] = std::thread([&, i]() {
-            int start = i * movesPerThread;
-            int end = std::min(start + movesPerThread, static_cast<int>(legalMoves.size()));
+    auto evaluateMoves = [&](int start, int end) {
+        int localBestScore = std::numeric_limits<int>::min();
+        Move localBestMove{-1, -1};
 
-            for (int j = start; j < end; ++j) {
-                Move move = legalMoves[j];
-                board->makeMove(move.x, move.y, CellState::Me);
-                int score = board->minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-                board->undoMove(move.x, move.y);
+        for (int j = start; j < end; ++j) {
+            Move move = legalMoves[j];
+            board->makeMove(move.x, move.y, CellState::Me);
+            int score = minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+            board->undoMove(move.x, move.y);
 
-                std::lock_guard<std::mutex> lock(mutex);
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestMove = move;
-                }
+            if (score > localBestScore) {
+                localBestScore = score;
+                localBestMove = move;
             }
-        });
+        }
+
+        std::lock_guard<std::mutex> lock(mutex);
+        if (localBestScore > bestScore) {
+            bestScore = localBestScore;
+            bestMove = localBestMove;
+        }
+    };
+
+    for (unsigned int i = 0; i < numThreads; ++i) {
+        int start = i * movesPerThread;
+        int end = std::min(start + movesPerThread, static_cast<int>(legalMoves.size()));
+
+        threads[i] = std::thread(evaluateMoves, start, end);
     }
 
     for (auto& t : threads) {
@@ -302,6 +312,8 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
     }
     return bestMove;
 }*/
+
+
 
 Gomoku::Move Gomoku::GameBot::calculateBestMove()
 {
@@ -382,15 +394,35 @@ int Gomoku::GameBot::evaluateCell(int x, int y, CellState type) {
     return score;
 }
 
-int Gomoku::GameBot::countConsecutiveStones(int x, int y, int dx, int dy, CellState type) {
+int Gomoku::GameBot::countConsecutiveStones(int x, int y, int dx, int dy, CellState type, bool& hasHole) {
     int count = 0;
     int i = 1;
-    while (board->isValidCoordinate(x + i*dx, y + i*dy) && board->getCellState(x + i*dx, y + i*dy) == type) {
-        count++;
-        i++;
+    bool holeCounted = false;
+    hasHole = false;
+
+    while (board->isValidCoordinate(x + i*dx, y + i*dy)) {
+        if (board->getCellState(x + i*dx, y + i*dy) == type) {
+            count++;
+            i++;
+            if (holeCounted) {
+                hasHole = true;
+                break;
+            }
+        } else if (board->getCellState(x + i*dx, y + i*dy) == CellState::Empty && !holeCounted) {
+            holeCounted = true;
+            i++;
+        } else {
+            break;
+        }
     }
+
+    if (holeCounted && board->isValidCoordinate(x + i*dx, y + i*dy) && board->getCellState(x + i*dx, y + i*dy) != type) {
+        hasHole = false;
+    }
+
     return count;
 }
+
 
 void Gomoku::GameBot::checkEnds(int x, int y, int dx, int dy, CellState type, int& openEnds, int& blockedEnds) {
     if (!board->isValidCoordinate(x, y)) {
@@ -404,18 +436,18 @@ void Gomoku::GameBot::checkEnds(int x, int y, int dx, int dy, CellState type, in
 
 
 int Gomoku::GameBot::evaluateLine(int x, int y, int dx, int dy, CellState type) {
-    int count = countConsecutiveStones(x, y, dx, dy, type);
+    bool hasHole = false;
+    int count = countConsecutiveStones(x, y, dx, dy, type, hasHole);
     int openEnds = 0;
     int blockedEnds = 0;
 
     checkEnds(x + (count + 1) * dx, y + (count + 1) * dy, dx, dy, type, openEnds, blockedEnds);
-
     checkEnds(x - dx, y - dy, dx, dy, type, openEnds, blockedEnds);
 
-    LineConfig config = {count, openEnds, blockedEnds};
-
+    LineConfig config = {count, openEnds, blockedEnds, hasHole};
     auto it = scoreMap.find(config);
-    if (it != scoreMap.end()) {
+    if (it != scoreMap.cend()) {
+
         return (type == CellState::Me) ? it->second : -(it->second);
     }
     return 0;
