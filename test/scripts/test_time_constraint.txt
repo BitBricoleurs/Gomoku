@@ -1,0 +1,6 @@
+START 20
+INFO timeout_turn 5000
+BOARD
+0,0,1
+1,1,2
+DONE
