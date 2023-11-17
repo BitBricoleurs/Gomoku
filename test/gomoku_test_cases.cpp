@@ -158,3 +158,11 @@ TEST(GomokuTest, DefenseAndAttack) {
     std::string aiResponse = executeAI(commands);
     EXPECT_EQ(aiResponse, "OK\n5,3\n");
 }
+
+TEST(GomokuTest, Defense) {
+std::string commands = readTestFile("scripts/test_defense.txt");
+ASSERT_FALSE(commands.empty()) << "Test file not found";
+
+std::string aiResponse = executeAI(commands);
+EXPECT_EQ(aiResponse, "OK\n5,5\n");
+}
