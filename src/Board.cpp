@@ -88,36 +88,6 @@ namespace Gomoku {
         return false;
     }
 
-    bool Board::isGameOver() const
-    {
-        for (int x = 0; x < size; ++x) {
-            for (int y = 0; y < size; ++y) {
-                if (cells[x][y].get_state() != CellState::Empty) {
-                    CellState player = cells[x][y].get_state();
-                    if (checkDirection(x, y, 1, 0, player) ||
-                        checkDirection(x, y, 0, 1, player) ||
-                        checkDirection(x, y, 1, 1, player) ||
-                        checkDirection(x, y, 1, -1, player)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    bool Board::checkDirection(int x, int y, int dx, int dy, CellState type) const
-    {
-        for (int i = 0; i < 5; ++i) {
-            if (x < 0 || x >= size || y < 0 || y >= size || cells[x][y].get_state() != type) {
-                return false;
-            }
-            x += dx;
-            y += dy;
-        }
-        return true;
-    }
-
     bool Board::isValidCoordinate(int x, int y) const
     {
         return x >= 0 && x < size && y >= 0 && y < size;
@@ -145,6 +115,35 @@ namespace Gomoku {
             std::cout << std::endl;
         }
     }
+
+    void Board::printBoard(int lastMoveX = -1, int lastMoveY = -1) const
+    {
+        std::cout << "  ";
+        for (int x = 0; x < size; ++x) {
+            std::cout << x % 10 << " ";
+        }
+        std::cout << std::endl;
+
+        for (int y = 0; y < size; ++y) {
+            std::cout << y % 10 << " ";
+            for (int x = 0; x < size; ++x) {
+                char cellChar = '.';
+                if (cells[x][y].get_state() == CellState::Me) {
+                    cellChar = 'X';
+                } else if (cells[x][y].get_state() == CellState::Opponent) {
+                    cellChar = 'O';
+                }
+
+                if (x == lastMoveX && y == lastMoveY) {
+                    std::cout << "[" << cellChar << "]";
+                } else {
+                    std::cout << " " << cellChar << " ";
+                }
+            }
+            std::cout << std::endl;
+        }
+    }
+
 
     int Board::getSize() const
     {
