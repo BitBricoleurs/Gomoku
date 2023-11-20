@@ -4,7 +4,6 @@
 
 #include "GameBot.hpp"
 
-#include <windows.h>
 #include <utility>
 #include <iostream>
 #include <sstream>
