@@ -5,5 +5,5 @@
 #include "LineConfig.hpp"
 
 bool LineConfig::operator==(const LineConfig& other) const {
-    return count == other.count && openEnds == other.openEnds && blockedEnds == other.blockedEnds && holes == other.holes;
+    return count == other.count && openEnds == other.openEnds && blockedEnds == other.blockedEnds;
 }

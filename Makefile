@@ -3,11 +3,11 @@ BINARY_NAME = pbrain-gomoku-ai
 TEST_BINARY_NAME = gomoku_tests
 
 all: $(BUILD_DIR)
-	cd $(BUILD_DIR) && cmake .. && make
+	cd $(BUILD_DIR) && cmake -DBUILD_TESTING=OFF .. && make
 	cp $(BUILD_DIR)/$(BINARY_NAME) .
 
 test: $(BUILD_DIR)
-	cd $(BUILD_DIR) && cmake .. && make $(TEST_BINARY_NAME)
+	cd $(BUILD_DIR) && cmake -DBUILD_TESTING=ON .. && make $(TEST_BINARY_NAME)
 	cd $(BUILD_DIR) && ctest -V
 
 $(BUILD_DIR):

@@ -19,26 +19,26 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  if(BUILD_TESTING)
+      include(FetchContent)
+      FetchContent_Declare(
+              googletest
+              URL https://github.com/google/googletest/archive/release-1.10.0.zip
+              DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+      )
+      FetchContent_MakeAvailable(googletest)
+
+      add_executable(gomoku_tests test/test_main.cpp test/gomoku_test_cases.cpp)
+      target_link_libraries(gomoku_tests gtest_main ${PROJECT_NAME_GOMOKU})
+
+      include(GoogleTest)
+      gtest_discover_tests(gomoku_tests)
+  endif()
+endif()
 set(PROJECT_NAME_GOMOKU pbrain-gomoku-ai)
 
 add_executable(${PROJECT_NAME_GOMOKU})
 set_target_properties(${PROJECT_NAME_GOMOKU} PROPERTIES ENABLE_EXPORTS ON)
 
 add_subdirectory(src)
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    enable_testing()
-    include(FetchContent)
-    FetchContent_Declare(
-            googletest
-            URL https://github.com/google/googletest/archive/release-1.10.0.zip
-            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    FetchContent_MakeAvailable(googletest)
-
-    add_executable(gomoku_tests test/test_main.cpp test/gomoku_test_cases.cpp)
-    target_link_libraries(gomoku_tests gtest_main ${PROJECT_NAME_GOMOKU})
-
-    include(GoogleTest)
-    gtest_discover_tests(gomoku_tests)
-endif()

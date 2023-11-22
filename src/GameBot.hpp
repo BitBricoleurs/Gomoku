@@ -54,23 +54,22 @@ namespace Gomoku {
 
         std::unordered_map<LineConfig, int, LineConfigHash> scoreMap = {
 
-                {{5, 2, 0, false}, 100000},
-                {{4, 2, 0, false}, 50000},
-                {{4, 1, 0, false}, 10000},
-                {{3, 2, 0, false}, 5000},
-                {{3, 1, 0, false}, 1000},
-
-                {{4, 2, 1, false}, 20000},
-                {{4, 1, 1, false}, 15000},
-                {{3, 2, 1, false}, 7500},
-                {{3, 2, 1, false}, 4000},
-                {{3, 1, 1, false}, 3000},
-                {{3, 2, 0, true}, 3000},
-                {{3, 2, 1, true}, 3000},
-                {{3, 1, 0, true}, 1500},
-                {{2, 2, 1, false}, 1000},
-                {{2, 2, 0, false}, 500},
-                {{2, 1, 0, false}, 200},
+                {{5, 2, 0}, 100000},
+                {{4, 2, 0}, 50000},
+                {{4, 1, 0}, 10000},
+                {{3, 2, 0}, 5000},
+                {{3, 1, 0}, 1000},
+                {{4, 2, 1}, 20000},
+                {{4, 1, 1}, 15000},
+                {{3, 2, 1}, 7500},
+                {{3, 2, 1}, 4000},
+                {{3, 1, 1}, 3000},
+                {{3, 2, 0}, 3000},
+                {{3, 2, 1}, 3000},
+                {{3, 1, 0}, 1500},
+                {{2, 2, 1}, 1000},
+                {{2, 2, 0}, 500},
+                {{2, 1, 0}, 200},
 
         };
 
@@ -95,7 +94,7 @@ namespace Gomoku {
 
         int timeoutMatch = 0;
 
-        int DEPTH = 3;
+        int DEPTH = 2;
 
         int maxMemoryMB = MAX_MEMORY_MB;
 
@@ -123,6 +122,10 @@ namespace Gomoku {
 
         static std::vector<int> parseLineToMoveDetails(const std::string &line);
 
-        int countConsecutiveStones(int x, int y, int dx, int dy, CellState type, bool &hasHole);
+        int countConsecutiveStones(int x, int y, int dx, int dy, CellState type);
+
+        bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
+
+        bool isGameOver() const;
     };
 }
