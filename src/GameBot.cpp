@@ -287,7 +287,12 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
 
     for (const auto& move : legalMoves) {
         board->makeMove(move.x, move.y, CellState::Me);
+        std::cout << "------------------------------------------------------------------" << std::endl;
+        std::cout << "Evaluate move first " << move.x << " " << move.y << std::endl;
+        board->printBoard();
         int score = minimax(DEPTH - 1, false, (std::numeric_limits<int>::min()), (std::numeric_limits<int>::max()));
+        std::cout << "Evaluate Score Move " << move.x << " " << move.y << "Score:  " << score << std::endl;
+        std::cout << "------------------------------------------------------------------" << std::endl;
         board->undoMove(move.x, move.y);
 
         if (score > bestScore) {
@@ -356,6 +361,9 @@ int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int 
         int maxEval = (std::numeric_limits<int>::min());
         for (const auto& move : board->getStrategicLegalMoves()) {
             board->makeMove(move.x, move.y, CellState::Me);
+            std::cout << "------------------------------------------------------------------" << std::endl;
+            std::cout << "Evaluate move Min max for Me" << move.x << " " << move.y << std::endl;
+            board->printBoard();
             int eval = minimax(depth - 1, false, alpha, beta);
             board->undoMove(move.x, move.y);
             maxEval = (std::max(maxEval, eval));
@@ -369,6 +377,9 @@ int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int 
         int minEval = (std::numeric_limits<int>::max());
         for (const auto& move : board->getStrategicLegalMoves()) {
             board->makeMove(move.x, move.y, CellState::Opponent);
+            std::cout << "------------------------------------------------------------------" << std::endl;
+            std::cout << "Evaluate move Min max for Opponent" << move.x << " " << move.y << std::endl;
+            board->printBoard();
             int eval = minimax(depth - 1, true, alpha, beta);
             board->undoMove(move.x, move.y);
             minEval = (std::min(minEval, eval));
@@ -388,6 +399,8 @@ int Gomoku::GameBot::evaluate()
         for (int y = 0; y <  board->getSize(); ++y) {
             CellState player = board->getCellState(x,y);
             if (player != CellState::Empty) {
+                std::cout << "------------------------------------------------------------------" << std::endl;
+                std::cout << "Evaluate cell " << x << " " << y << " for player " << static_cast<int>(player) << std::endl;
                 score += evaluateCell(x, y, player);
             }
         }
@@ -398,9 +411,13 @@ int Gomoku::GameBot::evaluate()
 int Gomoku::GameBot::evaluateCell(int x, int y, CellState type) {
     int score = 0;
 
+    std::cout << "Evaluate Horizontal" << std::endl;
     score += evaluateLine(x, y, 1, 0, type);
+    std::cout << "Evaluate Vertical" << std::endl;
     score += evaluateLine(x, y, 0, 1, type);
+    std::cout << "Evaluate Diagonal (down-right)" << std::endl;
     score += evaluateLine(x, y, 1, 1, type);
+    std::cout << "Evaluate Diagonal (up-left)" << std::endl;
     score += evaluateLine(x, y, -1, 1, type);
 
     return score;
@@ -411,7 +428,7 @@ int Gomoku::GameBot::countConsecutiveStones(int x, int y, int dx, int dy, CellSt
     int count = 0;
     int i = 1;
 
-    while (board->isValidCoordinate(x + i*dx, y + i*dy)) {
+    while (board->isValidCoordinate(x + i*dx, y + i*dy) && board->getCellState(x + i*dx, y + i*dy) == type) {
         if (board->getCellState(x + i*dx, y + i*dy) == type) {
             count++;
         }
@@ -447,23 +464,28 @@ int Gomoku::GameBot::countEmptySpaces(int x, int y, int dx, int dy)
 }
 
 int Gomoku::GameBot::evaluateLine(int x, int y, int dx, int dy, CellState type) {
-    int count = countConsecutiveStones(x, y, dx, dy, type) + countConsecutiveStones(x, y, -dx, -dy, type);
+    int countForward = countConsecutiveStones(x, y, dx, dy, type);
+    int countBackward = countConsecutiveStones(x, y, -dx, -dy, type);
+    int count = countForward + countBackward;
+
     int openEnds = 0;
     int blockedEnds = 0;
     int extraSpaces = 0;
 
-    checkEnds(x + (count + 1) * dx, y + (count + 1) * dy, dx, dy, type, openEnds, blockedEnds);
-    checkEnds(x - dx, y - dy, dx, dy, type, openEnds, blockedEnds);
+    checkEnds(x + (countForward + 1) * dx, y + (countForward + 1) * dy, dx, dy, type, openEnds, blockedEnds);
+    checkEnds(x - (countBackward + 1) * dx, y - (countBackward + 1) * dy, dx, dy, type, openEnds, blockedEnds);
 
 
     extraSpaces = countEmptySpaces(x + (count + 1) * dx, y + (count + 1) * dy, dx, dy) +
                  countEmptySpaces(x - (count + 1) * dx, y - (count + 1) * dy, -dx, -dy);
 
-    if (count + extraSpaces < 5)
-        return 0;
+    //if (count + extraSpaces < 5)
+        //return 0;
     LineConfig config = {count, openEnds, blockedEnds};
+    std::cout << "Line config: " << count << " " << openEnds << " " << blockedEnds << std::endl;
     auto it = scoreMap.find(config);
     if (it != scoreMap.cend()) {
+        std::cout << "Score: " << (type == CellState::Me ? it->second : -(it->second)) << std::endl;
         return (type == CellState::Me) ? it->second : -(it->second);
     }
     return 0;
