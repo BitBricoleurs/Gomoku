@@ -271,6 +271,8 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
     for (const auto& move : legalMoves) {
         board->makeMove(move.x, move.y, CellState::Me);
         int score = minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        //std::cout << "Score for move " << move.x << "," << move.y << " is " << score << std::endl;
+        //std::cout << "-------------------------------------------------------------------------------------------" << std::endl;
         board->undoMove(move.x, move.y);
 
         if (score > bestScore) {
@@ -320,7 +322,7 @@ int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int 
         int maxEval = std::numeric_limits<int>::min();
         for (const auto& move : board->getStrategicLegalMoves()) {
             board->makeMove(move.x, move.y, CellState::Me);
-            if (isPrintGame) board->printBoard(move.x, move.y);
+            //if (isPrintGame) board->printBoard(move.x, move.y);
             int eval = minimax(depth - 1, false, alpha, beta);
             board->undoMove(move.x, move.y);
             maxEval = std::max(maxEval, eval);
@@ -334,7 +336,7 @@ int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int 
         int minEval = std::numeric_limits<int>::max();
         for (const auto& move : board->getStrategicLegalMoves()) {
             board->makeMove(move.x, move.y, CellState::Opponent);
-            if (isPrintGame) board->printBoard(move.x, move.y);
+            //if (isPrintGame) board->printBoard(move.x, move.y);
             int eval = minimax(depth - 1, true, alpha, beta);
             board->undoMove(move.x, move.y);
             minEval = std::min(minEval, eval);
@@ -355,9 +357,11 @@ int Gomoku::GameBot::evaluate()
             CellState player = board->getCellState(x,y);
             if (player != CellState::Empty) {
                 score += evaluateCell(x, y, player);
+                //std::cout << "Score for cell " << x << "," << y << " is " << score << std::endl;
             }
         }
     }
+    //std::cout << "-------------------------------------------------------------------------------------------" << std::endl;
     return score;
 }
 
