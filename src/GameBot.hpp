@@ -70,6 +70,8 @@ namespace Gomoku {
                 {{2, 2, 1}, 1000},
                 {{2, 2, 0}, 500},
                 {{2, 1, 0}, 200},
+                {{1, 1, 0}, 10},
+                {{1, 0, 0}, 5},
 
         };
 
@@ -94,7 +96,7 @@ namespace Gomoku {
 
         int timeoutMatch = 0;
 
-        int DEPTH = 2;
+        int DEPTH = 3;
 
         int maxMemoryMB = MAX_MEMORY_MB;
 
@@ -126,6 +128,10 @@ namespace Gomoku {
 
         bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
 
-        bool isGameOver() const;
+        bool isGameOver();
+
+        int countEmptySpaces(int x, int y, int dx, int dy);
+
+        bool isGameOver(CellState &winnerType);
     };
 }
