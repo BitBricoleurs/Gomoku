@@ -265,14 +265,12 @@ bool Gomoku::GameBot::isEndBot() const
 Gomoku::Move Gomoku::GameBot::calculateBestMove()
 {
     std::vector<Move> legalMoves = board->getStrategicLegalMoves();
-    int bestScore = std::numeric_limits<int>::min();
+    int bestScore = (std::numeric_limits<int>::min());
     Move bestMove{-1, -1};
 
     for (const auto& move : legalMoves) {
         board->makeMove(move.x, move.y, CellState::Me);
-        int score = minimax(DEPTH - 1, false, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-        //std::cout << "Score for move " << move.x << "," << move.y << " is " << score << std::endl;
-        //std::cout << "-------------------------------------------------------------------------------------------" << std::endl;
+        int score = minimax(DEPTH - 1, false, (std::numeric_limits<int>::min()), (std::numeric_limits<int>::max()));
         board->undoMove(move.x, move.y);
 
         if (score > bestScore) {
@@ -319,28 +317,28 @@ int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int 
     }
 
     if (isMaximizingPlayer) {
-        int maxEval = std::numeric_limits<int>::min();
+        int maxEval = (std::numeric_limits<int>::min());
         for (const auto& move : board->getStrategicLegalMoves()) {
             board->makeMove(move.x, move.y, CellState::Me);
             //if (isPrintGame) board->printBoard(move.x, move.y);
             int eval = minimax(depth - 1, false, alpha, beta);
             board->undoMove(move.x, move.y);
-            maxEval = std::max(maxEval, eval);
-            alpha = std::max(alpha, eval);
+            maxEval = (std::max(maxEval, eval));
+            alpha = (std::max(alpha, eval));
             if (beta <= alpha) {
                 break;
             }
         }
         return maxEval;
     } else {
-        int minEval = std::numeric_limits<int>::max();
+        int minEval = (std::numeric_limits<int>::max());
         for (const auto& move : board->getStrategicLegalMoves()) {
             board->makeMove(move.x, move.y, CellState::Opponent);
             //if (isPrintGame) board->printBoard(move.x, move.y);
             int eval = minimax(depth - 1, true, alpha, beta);
             board->undoMove(move.x, move.y);
-            minEval = std::min(minEval, eval);
-            beta = std::min(beta, eval);
+            minEval = (std::min(minEval, eval));
+            beta = (std::min(beta, eval));
             if (beta <= alpha) {
                 break;
             }
