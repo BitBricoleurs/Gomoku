@@ -35,9 +35,9 @@ namespace Gomoku {
 
         [[nodiscard]] CellState getCellState(int x, int y) const;
 
-        [[nodiscard]] bool isGameOver() const;
-
         [[nodiscard]] bool isValidCoordinate(int x, int y) const;
+
+        void printBoard(int lastMoveX, int lastMoveY) const;
 
     private:
         int size;
@@ -45,8 +45,6 @@ namespace Gomoku {
         std::vector<std::vector<Cell>> cells;
 
         [[nodiscard]] bool isNearbyOccupied(int x, int y) const;
-
-        [[nodiscard]] bool checkDirection(int x, int y, int dx, int dy, CellState type) const;
 
     };
 }
