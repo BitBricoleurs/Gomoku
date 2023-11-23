@@ -5,6 +5,8 @@
 #pragma once
 
 #include <string>
+#include <iostream>
+#include <sstream>
 #include <unordered_map>
 #include "GameBot.hpp"
 
@@ -38,7 +40,7 @@ namespace Gomoku {
 
             void initializeCommandMap();
 
-        std::string trim(const std::string &str);
+        static std::string trim(const std::string &str);
     };
 
 }

@@ -4,10 +4,6 @@
 
 #include "Core.hpp"
 
-#include <utility>
-#include <iostream>
-#include <sstream>
-
 namespace Gomoku {
 
     Core::Core(bool isPrintGame, bool valgrindEnable, const std::string& nameBot): myBot(std::make_unique<GameBot>(isPrintGame, valgrindEnable, nameBot))
