@@ -108,7 +108,7 @@ TEST(GomokuTest, ComplexConfig) {
     ASSERT_FALSE(commands.empty()) << "Test file not found";
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n12,12\n");
+    EXPECT_EQ(aiResponse, "OK\n8,7\n");
 }
 
 TEST(GomokuTest, AnticipationTrap) {

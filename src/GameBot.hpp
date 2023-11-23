@@ -11,6 +11,9 @@
 #include <map>
 #include <mutex>
 #include <cmath>
+#include <future>
+#include <vector>
+#include <mutex>
 
 #ifdef _WIN32
     #define NOMINMAX
@@ -24,9 +27,6 @@
 
 #include "Board.hpp"
 #include "LineConfigHash.hpp"
-
-    constexpr int MAX_MEMORY_MB = 70;
-    constexpr std::chrono::seconds MAX_TIME_PER_MOVE(5);
 
 namespace Gomoku {
 
@@ -48,9 +48,13 @@ namespace Gomoku {
 
         static void respond(const std::string& response);
 
+    private:
+
         std::map<std::string, std::string> infoMap;
 
-    private:
+        int MAX_MEMORY_MB = 70;
+
+        std::chrono::seconds MAX_TIME_PER_MOVE = std::chrono::seconds(5);
 
         std::unordered_map<LineConfig, int, LineConfigHash> scoreMap = {
 
@@ -73,18 +77,20 @@ namespace Gomoku {
 
 
                 // Critical
-                {{3, 2, 0}, 1000}, // block 3 in a row 2 open End
-                {{4, 2, 0}, 5000},
-                {{4, 1, 1}, 501},
-                {{4, 0, 2}, 501},
+                {{3, 2, 0}, 6000}, // block 3 in a row 2 open End
+                {{4, 2, 0}, 10000},
+                {{4, 1, 1}, 8000},
+                {{4, 0, 2}, 5000},
                 {{4, 0, 1}, 500},
 
                 // Attack
-                {{3, 1, 1}, 400},
+                {{3, 1, 1}, 2000},
                 {{2, 1, 1}, 20},
                 {{2, 2, 0}, 20},
-                {{1, 1, 1}, 10},
+                //{{1, 1, 1}, 10},
                 {{1, 2, 0}, 10}
+
+
 
         };
 
@@ -109,7 +115,7 @@ namespace Gomoku {
 
         int timeoutMatch = 0;
 
-        int DEPTH = 2;
+        int DEPTH = 3;
 
         int maxMemoryMB = MAX_MEMORY_MB;
 
@@ -129,8 +135,6 @@ namespace Gomoku {
 
         int evaluate();
 
-        int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
-
         void checkEnds(int x, int y, int dx, int dy, CellState type, int &openEnds, int &blockedEnds);
 
         bool isValidMove(const std::vector<int> &moveDetails);
@@ -146,5 +150,9 @@ namespace Gomoku {
         int countEmptySpaces(int x, int y, int dx, int dy);
 
         bool isGameOver(CellState &winnerType);
+
+        int minimax(Board boardCpy, int depth, bool isMaximizingPlayer, int alpha, int beta);
+
+        int minimax(int depth, bool isMaximizingPlayer, int alpha, int beta);
     };
 }
