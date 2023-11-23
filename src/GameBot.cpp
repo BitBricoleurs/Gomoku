@@ -357,7 +357,6 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
     return bestMove;
 }
 
-
 /*
 Gomoku::Move Gomoku::GameBot::calculateBestMove() {
     std::vector<Move> legalMoves = board->getStrategicLegalMoves();
@@ -368,6 +367,8 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove() {
             Board localBoard = *board;
             localBoard.makeMove(move.x, move.y, CellState::Me);
             int score = minimax(localBoard, DEPTH - 1, false, (std::numeric_limits<int>::min()), (std::numeric_limits<int>::max()));
+            std::cout << "Move " << move.x << " " << move.y << " " << "Score:  " << score << std::endl;
+            std::cout << "Score Move " << move.x << " " << move.y << " " << "Score:  " << score << std::endl;
             localBoard.undoMove(move.x, move.y);
             return std::make_pair(move, score);
         }));
@@ -385,9 +386,9 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove() {
     }
 
     return bestMove;
-}*/
+}
 
-/*
+
 int Gomoku::GameBot::minimax(Board boardCpy, int depth, bool isMaximizingPlayer, int alpha, int beta)
 {
     if (depth == 0 || isGameOver()) {
@@ -428,6 +429,7 @@ int Gomoku::GameBot::minimax(Board boardCpy, int depth, bool isMaximizingPlayer,
         return minEval;
     }
 }*/
+
 
 int Gomoku::GameBot::minimax(int depth, bool isMaximizingPlayer, int alpha, int beta)
 {
