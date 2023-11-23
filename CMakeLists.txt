@@ -16,7 +16,13 @@ else()
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
+endif()
+
+if(NOT MSVC)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    set(BUILD_SHARED_LIBRARIES OFF)
+    set(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
 set(PROJECT_NAME_GOMOKU pbrain-gomoku-ai)

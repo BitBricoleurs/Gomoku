@@ -6,6 +6,10 @@ all: $(BUILD_DIR)
 	cd $(BUILD_DIR) && cmake -DBUILD_TESTING=OFF .. && make
 	cp $(BUILD_DIR)/$(BINARY_NAME) .
 
+release: $(BUILD_DIR)
+	cd $(BUILD_DIR) && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF .. && make
+	cp $(BUILD_DIR)/$(BINARY_NAME) .
+
 test: $(BUILD_DIR)
 	cd $(BUILD_DIR) && cmake -DBUILD_TESTING=ON .. && make $(TEST_BINARY_NAME)
 	cd $(BUILD_DIR) && ctest -V
