@@ -3,7 +3,6 @@
 #include "Core.hpp"
 #include "Error.hpp"
 
-
 int main(int ac, char **av) {
     try {
         bool printMode = false;

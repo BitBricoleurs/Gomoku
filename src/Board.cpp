@@ -2,7 +2,6 @@
 // Created by alexandre on 07/11/23.
 //
 
-#include <iostream>
 #include "Board.hpp"
 
 namespace Gomoku {

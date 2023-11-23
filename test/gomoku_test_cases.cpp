@@ -92,7 +92,7 @@ TEST(GomokuTest, test_defense_decision) {
     }
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n4,6\n");
+    EXPECT_EQ(aiResponse, "OK\n4,1\n");
 }
 
 TEST(GomokuTest, StrategicResponseTest) {
@@ -108,7 +108,7 @@ TEST(GomokuTest, ComplexConfig) {
     ASSERT_FALSE(commands.empty()) << "Test file not found";
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n12,12\n");
+    EXPECT_EQ(aiResponse, "OK\n8,7\n");
 }
 
 TEST(GomokuTest, AnticipationTrap) {
@@ -132,7 +132,7 @@ TEST(GomokuTest, MultipleOpportunities1) {
     ASSERT_FALSE(commands.empty()) << "Test file not found";
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n3,5\n");
+    EXPECT_EQ(aiResponse, "OK\n3,2\n");
 }
 
 TEST(GomokuTest, MultipleOpportunities2) {

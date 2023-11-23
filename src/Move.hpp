@@ -2,6 +2,10 @@
 // Created by alexandre on 07/11/23.
 //
 
+#pragma once
+
+#include <string>
+
 namespace Gomoku {
 
     struct Move {

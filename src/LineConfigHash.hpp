@@ -2,8 +2,8 @@
 // Created by alexandre on 13/11/23.
 //
 
-#include "LineConfig.hpp"
 #include <functional>
+#include "LineConfig.hpp"
 
 struct LineConfigHash {
 

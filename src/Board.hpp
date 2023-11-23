@@ -8,6 +8,8 @@
 #include <vector>
 #include <unordered_map>
 #include <numeric>
+#include <iostream>
+
 #include "Cell.hpp"
 #include "Move.hpp"
 
