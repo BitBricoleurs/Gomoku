@@ -395,11 +395,11 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
 
     timeIsUp = false;
 
+    searchComplete = false;
     std::thread timeThread(&GameBot::timeWatcher, this, timeout_turn - 100);
 
     for (const auto& move : legalMoves) {
         if (timeIsUp.load()) {
-            std::cerr << "Time is up" << std::endl;
             break;
         }
         board->makeMove(move.x, move.y, CellState::Me);
@@ -411,14 +411,15 @@ Gomoku::Move Gomoku::GameBot::calculateBestMove()
             bestMove = move;
         }
     }
+
+    searchComplete = true;
+
     if (timeThread.joinable()) {
         timeThread.join();
     }
     if (bestMove.x == -1 && bestMove.y == -1) {
-        std::cerr << "No move found" << std::endl;
         return legalMoves.front();
     }
-
     return bestMove;
 }
 
@@ -546,26 +547,28 @@ int Gomoku::GameBot::evaluateLine(int x, int y, int dx, int dy, CellState type) 
 
 
     extraSpaces = countEmptySpaces(x + (count + 1) * dx, y + (count + 1) * dy, dx, dy) +
-                 countEmptySpaces(x - (count + 1) * dx, y - (count + 1) * dy, -dx, -dy);
+                  countEmptySpaces(x - (count + 1) * dx, y - (count + 1) * dy, -dx, -dy);
 
     if (count + extraSpaces < 5)
         return 0;
     LineConfig config = {count, openEnds, blockedEnds};
     auto it = scoreMap.find(config);
     if (it != scoreMap.cend()) {
-        if (type == CellState::Me) {
-            return it->second;
-        } else {
-            return -(it->second) * 1.2;
-        }
+        return (type == CellState::Me) ? it->second : -(it->second) * 1.2;
     }
     return 0;
 }
 
-
 void Gomoku::GameBot::timeWatcher(int timeLimitMs)
 {
-    if (timeLimitMs <= 0) return;
-    std::this_thread::sleep_for(std::chrono::milliseconds(timeLimitMs));
-    timeIsUp = true;
+    auto startTime = std::chrono::steady_clock::now();
+    while (true) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count();
+        if (elapsedTime >= timeLimitMs || searchComplete.load()) {
+            timeIsUp = true;
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
 }

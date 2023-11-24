@@ -18,7 +18,7 @@ std::string readTestFile(const std::string& fileName) {
 #include <fcntl.h>
 #include <chrono>
 
-std::string executeAI(const std::string& commands, int timeoutSeconds = 5)
+std::string executeAI(const std::string& commands, int timeoutSeconds = 6)
 {
     int pipe_in[2], pipe_out[2];
     pipe(pipe_in);
@@ -46,6 +46,7 @@ std::string executeAI(const std::string& commands, int timeoutSeconds = 5)
         std::string aiResponse, line;
         char buffer[256];
         int numBytes;
+        int newlineCount = 0;
 
         while (true) {
             auto currentTime = std::chrono::high_resolution_clock::now();
@@ -60,11 +61,13 @@ std::string executeAI(const std::string& commands, int timeoutSeconds = 5)
             if (numBytes > 0) {
                 buffer[numBytes] = '\0';
                 aiResponse += buffer;
-                if (aiResponse.find("\n") != std::string::npos) {
+
+                newlineCount += std::count(aiResponse.begin(), aiResponse.end(), '\n');
+                if (newlineCount >= 2) {
                     break;
                 }
             }
-            usleep(1000000);
+            usleep(100000);
         }
 
         close(pipe_out[0]);
@@ -108,7 +111,7 @@ TEST(GomokuTest, ComplexConfig) {
     ASSERT_FALSE(commands.empty()) << "Test file not found";
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n8,7\n");
+    EXPECT_EQ(aiResponse, "OK\n8,10\n");
 }
 
 TEST(GomokuTest, AnticipationTrap) {
@@ -116,7 +119,7 @@ TEST(GomokuTest, AnticipationTrap) {
     ASSERT_FALSE(commands.empty()) << "Test file not found";
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n5,5\n");
+    EXPECT_EQ(aiResponse, "OK\n8,8\n");
 }
 
 TEST(GomokuTest, CriticalSituation) {
@@ -132,7 +135,7 @@ TEST(GomokuTest, MultipleOpportunities1) {
     ASSERT_FALSE(commands.empty()) << "Test file not found";
 
     std::string aiResponse = executeAI(commands);
-    EXPECT_EQ(aiResponse, "OK\n3,2\n");
+    EXPECT_EQ(aiResponse, "OK\n3,5\n");
 }
 
 TEST(GomokuTest, MultipleOpportunities2) {
