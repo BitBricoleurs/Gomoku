@@ -73,6 +73,18 @@ jobs:
       - name: Compile Program
         run: |
           make
+    
+  run_tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Tests
+        run: |
+          makes
+          make tests
 
   # check_program_compilation_macos:
   #   name: Check Program Compilation (macOS)
