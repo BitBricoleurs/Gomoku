@@ -14,6 +14,7 @@
 #include <future>
 #include <vector>
 #include <mutex>
+#include <atomic>
 
 #ifdef _WIN32
     #define NOMINMAX
@@ -48,7 +49,12 @@ namespace Gomoku {
 
         static void respond(const std::string& response);
 
+
     private:
+
+        std::atomic<bool> timeIsUp;
+
+        void timeWatcher(int timeLimitMs);
 
         std::map<std::string, std::string> infoMap;
 
@@ -100,14 +106,10 @@ namespace Gomoku {
 
         bool areValidCoordinates(const std::string &xStr, const std::string &yStr);
 
-        void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
-                                     const std::chrono::time_point<std::chrono::steady_clock> &endTime);
 
         Move calculateBestMove();
 
         void enforceMemoryLimit() const;
-
-        void enforceMatchTimeLimit();
 
         std::unique_ptr<Board> board;
 
