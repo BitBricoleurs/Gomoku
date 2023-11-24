@@ -14,6 +14,7 @@
 #include <future>
 #include <vector>
 #include <mutex>
+#include <atomic>
 
 #ifdef _WIN32
     #define NOMINMAX
@@ -48,7 +49,14 @@ namespace Gomoku {
 
         static void respond(const std::string& response);
 
+
     private:
+
+        std::atomic<bool> timeIsUp;
+
+        std::atomic<bool> searchComplete;
+
+        void timeWatcher(int timeLimitMs);
 
         std::map<std::string, std::string> infoMap;
 
@@ -58,25 +66,8 @@ namespace Gomoku {
 
         std::unordered_map<LineConfig, int, LineConfigHash> scoreMap = {
 
-                //{{5, 2, 0}, 100000},
-                //{{4, 2, 0}, 50000},
-                //{{4, 1, 0}, 10000},
-                //{{3, 2, 0}, 5000},
-                //{{4, 1, 1}, 1000}, // block border
-                ///{{3, 1, 0}, 1000}, // block holes
-                //{{3, 0, 2}, 1000}, // block holes
-                //{{4, 2, 1}, 20000},
-                //{{4, 1, 1}, 15000},
-                //{{3, 2, 1}, 7500},
-                //{{3, 2, 1}, 4000},
-                //{{3, 1, 1}, 3000},
-                //{{3, 2, 0}, 3000},
-                //{{3, 2, 1}, 3000},
-                //{{3, 1, 0}, 1500},
-                //{{2, 2, 1}, 1000},
-
-
                 // Critical
+
                 {{3, 2, 0}, 6000}, // block 3 in a row 2 open End
                 {{4, 2, 0}, 10000},
                 {{4, 1, 1}, 8000},
@@ -90,8 +81,6 @@ namespace Gomoku {
                 //{{1, 1, 1}, 10},
                 {{1, 2, 0}, 10}
 
-
-
         };
 
         static size_t getMemoryUsage();
@@ -100,14 +89,10 @@ namespace Gomoku {
 
         bool areValidCoordinates(const std::string &xStr, const std::string &yStr);
 
-        void enforceTimeLimit(const std::chrono::time_point<std::chrono::steady_clock> &startTime,
-                                     const std::chrono::time_point<std::chrono::steady_clock> &endTime);
 
         Move calculateBestMove();
 
         void enforceMemoryLimit() const;
-
-        void enforceMatchTimeLimit();
 
         std::unique_ptr<Board> board;
 
