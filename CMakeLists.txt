@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(GOMOKU LANGUAGES CXX)
 
+find_package(Threads REQUIRED)
+
 file(COPY ${CMAKE_SOURCE_DIR}/test/scripts DESTINATION .)
 
 if(NOT CMAKE_CXX_EXTENSIONS)
@@ -31,6 +33,8 @@ add_executable(${PROJECT_NAME_GOMOKU})
 set_target_properties(${PROJECT_NAME_GOMOKU} PROPERTIES ENABLE_EXPORTS ON)
 
 add_subdirectory(src)
+
+target_link_libraries(pbrain-gomoku-ai PRIVATE Threads::Threads)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     if(BUILD_TESTING)
